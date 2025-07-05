@@ -1,5 +1,7 @@
 # Welcome Group3 to your project phase
 
+Data-Link: https://www.kaggle.com/datasets/jayeshrmohanani/dataset-for-microplastic-consumption-in-food-items/data?select=processed_microplastics.csv
+
 ## The scenario: Processed Microplastics
 You are now working with the PurePlate Initiative, a global non-profit advocacy group dedicated to promoting food safety and raising awareness about emerging contaminants in the human diet. The PurePlate Initiative is particularly concerned about the increasing presence of microplastics in our food supply and its potential long-term health implications.
 They have acquired a unique dataset on estimated microplastic consumption and need your team to conduct a thorough analysis. The goal is to identify trends, pinpoint high-risk food categories, and understand geographical variations in microplastic intake. Your findings will be crucial for informing public health campaigns, influencing dietary guidelines, and advocating for stricter regulations on plastic production and waste management.
