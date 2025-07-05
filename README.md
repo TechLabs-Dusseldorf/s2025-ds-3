@@ -1,1 +1,1 @@
-# Welcome to the Repository of Group3 in Sommer2025
+# Welcome to the Repository of Group3 in Summer2025
