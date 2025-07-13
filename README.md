@@ -12,7 +12,7 @@ Using a unique dataset on estimated microplastic consumption, this project aims 
 The findings will support public health campaigns, inform dietary guidelines, and advocate for stronger regulations on plastic production and waste management.
 
 ## Authors
-Humam
-Negin
-Nicole
-Gaetano
+- Humam
+- Negin
+- Nicole
+- Gaetano
