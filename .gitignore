@@ -1,3 +1,4 @@
 .ipynb_checkpoints/
 .syncthing*
 __pycache__/
+venv/
