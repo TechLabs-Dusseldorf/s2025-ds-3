@@ -2,3 +2,4 @@
 .syncthing*
 __pycache__/
 venv/
+.venv/
