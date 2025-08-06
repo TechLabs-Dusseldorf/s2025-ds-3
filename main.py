@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
 
+#TODO: Use more functions to declutter the code (MD)
 
 # Open the File as a DataFram
 df = pd.read_csv(r"./processed_microplastics.csv")
