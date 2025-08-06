@@ -45,7 +45,7 @@ print(average)
 # 4. I put a grid in the back and the dots at every "change point"
 
 # Print how the global average total_ug_per_kg has changed over the years (1990-2018)
-%matplotlib inline
+#%matplotlib inline
 
 yearaverage = df.groupby("year")["total_ug_per_kg"].mean()
 
