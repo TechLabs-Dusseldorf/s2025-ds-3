@@ -10,7 +10,7 @@ st.set_page_config(
 st.markdown(
     '<div style="text-align: center; padding-top: 2rem;">'
     '<h1 style="font-size: 3rem; color: #2f3e46;">🥄  PureData</h1>'
-    '<h3 style="color: #52796f; font-weight: 400;">A Minimalist Look at Microplastics in Our Food</h3>'
+    '<h3 style="color: #52796f; font-weight: 400;">A Look at Microplastics in Our Food</h3>'
     '</div>',
     unsafe_allow_html=True
 )
