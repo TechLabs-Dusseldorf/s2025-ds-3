@@ -3,8 +3,9 @@
 #     - Display the first 5 rows and check the data types of all columns.
 #     - Identify and handle any missing values.
 #     - List all unique Country values in the dataset.
+# 
 
-# Basic command
+# Basic imports
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
