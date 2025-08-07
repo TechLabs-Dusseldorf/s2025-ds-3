@@ -3,13 +3,16 @@
 #     - Display the first 5 rows and check the data types of all columns.
 #     - Identify and handle any missing values.
 #     - List all unique Country values in the dataset.
+# 
 
-# Basic command
+# Basic imports
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
+
+#TODO: Use more functions to declutter the code (MD)
 
 # Open the File as a DataFram
 df = pd.read_csv(r"./processed_microplastics.csv")
@@ -45,7 +48,7 @@ print(average)
 # 4. I put a grid in the back and the dots at every "change point"
 
 # Print how the global average total_ug_per_kg has changed over the years (1990-2018)
-%matplotlib inline
+#%matplotlib inline
 
 yearaverage = df.groupby("year")["total_ug_per_kg"].mean()
 
