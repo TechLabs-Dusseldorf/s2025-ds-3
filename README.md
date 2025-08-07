@@ -11,8 +11,45 @@ Using a unique dataset on estimated microplastic consumption, this project aims 
 
 The findings will support public health campaigns, inform dietary guidelines, and advocate for stronger regulations on plastic production and waste management.
 
+## How To: Install and Run the Project
+
+Follow these steps to set up and run the Group3 Summer2025 microplastics analysis project.
+
+### 1. System Requirements
+
+Ensure your system meets the following requirements:
+
+1. Python 3.8 or higher  
+2. Git  
+3. pip  
+4. *(Optional)* A virtual environment manager to avoid conflicts (`venv`, `virtualenv`, or `conda`)  
+
+---
+
+### 2. Install Dependencies
+
+1. Ensure you're in the project root directory.  
+2. Install required packages using:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+---
+
+### 3. Running the Python Scripts
+
+1. Run the Python script using:
+
+    ```bash
+    python main.py run
+    ```
+
+---
+
 ## Authors
-- Humam
-- Negin
-- Nicole
+
+- Humam  
+- Negin  
+- Nicole  
 - Gaetano
