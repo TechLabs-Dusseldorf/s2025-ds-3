@@ -1,5 +1,7 @@
 .ipynb_checkpoints/
 .syncthing*
+__pycache__/
+venv/
 .venv/
 VSCode - Git.docx
 ~$Code - Git.docx

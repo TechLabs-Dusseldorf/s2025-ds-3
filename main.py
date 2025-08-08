@@ -3,8 +3,9 @@
 #     - Display the first 5 rows and check the data types of all columns.
 #     - Identify and handle any missing values.
 #     - List all unique Country values in the dataset.
+# 
 
-# Basic command
+# Basic imports
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -69,6 +70,38 @@ plt.show()
 # - Top Food Contributors:
 #     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
 #     - Visualize the average microplastic content for the top 10 food categories.
+
+# My roadmap: We calculate the average consumption for each food category. We put the averages and their related category name in a list. Then, I sort the list to get the top three food categories.
+# First, I need to define which columns are food columns (and not country names, year, and total consumption). I define variable 'food_columns' and put those columns in it.
+# I can calculate averages for each column. But, I need to save them somewhere, so that I can later compare the numbers. So, I first make a list, called 'mean_list'.
+# But, at the end I want to have the names of food categories, not the average numbers themselves. I decided to make a tuple, which consists of column names and average consumption.
+# To add (append) each category and averages to the list, I use a for loop.
+# I sort this list by using sort() method. But, I need to define a key, such that the list can be sorted by the average numbers. If I don't do this, they will be sorted alphabetically by the category names.
+# Therefore, I define function sorting_by_avg(). This function returns the second items in our tuples, which are the average numbers.
+
+mean_list = []
+def sorting_by_avg(key):
+    return key[1]
+
+food_columns = df.columns[2:-1]
+for column in food_columns:
+    mean_list.append([column, df[column].mean()])
+mean_list.sort(key = sorting_by_avg, reverse=True)
+
+for category, average in mean_list[:3]:
+    print(category)
+
+# Store names and averages of top 10 food categories for plotting (prevents loop from only showing the last item)
+top_10_categories = [category for category, average in mean_list[:10]]
+top_10_averages = [average for category, average in mean_list[:10]]
+
+# plotting a bar chart
+plt.figure(figsize=(10, 6))
+plt.barh(top_10_categories[::-1], top_10_averages[::-1])
+plt.xlabel('Average Microplastic Consumption (μg/kg)')
+plt.title('Top 10 Food Categories by Microplastic Content')
+plt.tight_layout()
+plt.show()
 
 # - Country-Level Totals:
 #     - Which 5 countries have the highest average total_ug_per_kg over the entire period (1990-2018)?
