@@ -195,7 +195,7 @@ change_p = change_dec.map(lambda x: f"{x:.2f}%")
 # Sort in decreasing order 
 change_dec_sorted = change_dec.sort_values(ascending=False)
 change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
-change_p_sorted
+print(change_p_sorted)
 
 
 # - Country-Specific Microplastic Profiles:
