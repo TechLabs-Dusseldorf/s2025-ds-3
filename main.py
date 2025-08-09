@@ -129,6 +129,75 @@ plt.show()
 #     - For the top 3 food categories with the highest microplastic content, analyze their individual trends over time (1990-2018). Are some increasing more rapidly than others?
 #     - Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1991) and latest (2018) years. Describe the shifts in contribution.
 
+#Find out the total per year of all countries together for the top 3 food categories
+total_highest = df.groupby("year")[top_categories[0:3]].sum()
+
+#Plot a line chart to visualize the trends of each category
+ax = total_highest.plot(marker='o', figsize=(10, 6))
+
+plt.title("Microplastic content (1990-2018)")
+plt.xlabel("Year")
+plt.ylabel("Total µg/kg")
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
+
+
+#Create a new dictionary for the results
+results = {}
+
+#Use slope to calculate the increase
+for cat in top_categories[0:3]:
+    y = total_highest[cat].values
+    x = total_highest.index.values
+    slope = np.polyfit(x, y, 1)[0]
+    results[cat] = slope
+
+#Make an order from fastest to slowest increase
+sorted_results = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
+for cat, slope in sorted_results.items():
+    print(f"{cat}: {slope:.2f} µg/kg per year")
+
+print()
+
+#Print the category with the fastest increase
+fastest = max(results, key=results.get)
+print(f"Fastest increase: {fastest} ({results[fastest]:.2f} µg/kg per year)")
+
+
+# Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1990) and latest (2018) years
+
+#Filter the food columns (first 2 columns and last column are no food)
+food_cols = df.columns[2:-1]
+
+#Add the contribution of each country together and group only for 1990 and 2018
+total_cat_year = df.groupby("year")[food_cols].sum().loc[[1990, 2018]]
+total_per_year =  df.groupby("year")["total_ug_per_kg"].sum().loc[[1990, 2018]]
+
+#Calculate the contribution of each food to the total per year (1990, 2018) and give out in %
+
+percentage_dec = total_cat_year.div(total_per_year, axis=0) * 100
+percentage_p = percentage_dec.applymap(lambda x: f"{x:.2f}%")
+
+# Extract data for 1990 and 2018 Daten
+p_1990 = percentage_p.loc[1990].rename("1990")
+p_2018 = percentage_p.loc[2018].rename("2018")
+
+# Put them next to each other in comparison 
+p_compare = pd.concat([p_1990, p_2018], axis=1)
+print(p_compare)
+
+# Describe the shifts in contribution / changes
+change_dec = ((percentage_dec.loc[2018] - percentage_dec.loc[1990]) / percentage_dec.loc[1990]) * 100
+change_p = change_dec.map(lambda x: f"{x:.2f}%")
+
+# Sort in decreasing order 
+change_dec_sorted = change_dec.sort_values(ascending=False)
+change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
+print(change_p_sorted)
+
+
 # - Country-Specific Microplastic Profiles:
 #     - Select two countries with significantly different average total_ug_per_kg (one high, one low, from your beginner analysis).
 #     - For each selected country, visualize the breakdown of total_ug_per_kg by different food categories for the year 2018. Highlight the food categories contributing most to microplastic intake in these specific countries.
@@ -248,5 +317,4 @@ top_drivers_slope = df_growth_rates.sort_values(["country", "slope_percent_per_y
 # 
 # > Remember to provide clear visualizations and concise explanations for all your findings. Your analysis will contribute directly to a vital public health discussion!
 # 
-
 
