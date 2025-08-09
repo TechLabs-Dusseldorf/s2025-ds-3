@@ -62,6 +62,12 @@ Run plots:
 python plots.py run
 ```
 
+Run the Streamlit Web App from the project root:
+
+```bash
+streamlit run 🌐_Home.py
+```
+
 ---
 
 ## Authors
