@@ -107,6 +107,21 @@ plt.show()
 #     - Which 5 countries have the highest average total_ug_per_kg over the entire period (1990-2018)?
 #     - Which 5 countries have the lowest average total_ug_per_kg?
 
+"""
+Since what we need is over the entire period, we will groub the Data by the countries column, then focues on the column which we need (in this case: country and the avg_high_low_column) then we take the describe since it allows us to check more than one value (more modularity) and lastly we simply take the head x and tail x for the higest and lowest averages.
+"""
+
+avg_high_low_column = 'total_ug_per_kg'
+value_to_check = 'mean'
+number_of_high_low_countries = 5
+
+df_high_low_countries = df.groupby('country')[['country', avg_high_low_column]].describe()[avg_high_low_column].sort_values(by=value_to_check, ascending=False)[value_to_check]
+
+highest_high_low_countries = df_high_low_countries.head(number_of_high_low_countries)
+
+lowest_high_low_countries = df_high_low_countries.tail(number_of_high_low_countries)
+
+
 # - Initial Time-Series for a Food Category:
 #     - Choose one of the top 3 food categories identified in question 3. How has the microplastic content in this specific food category changed over time (1990-2018) globally? Visualize this trend.
 
