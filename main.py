@@ -11,7 +11,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
+import os
 
+
+if not os.path.exists("output"):
+    os.makedirs('output')
 #TODO: Use more functions to declutter the code (MD)
 
 # Open the File as a DataFram
@@ -65,7 +69,7 @@ for x, y in zip(yearaverage.index, yearaverage.values):
 
 plt.grid(True)
 plt.tight_layout()
-plt.show()
+plt.savefig("output/total_per_year.png")
 
 # - Top Food Contributors:
 #     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
@@ -88,8 +92,8 @@ for column in food_columns:
     mean_list.append([column, df[column].mean()])
 mean_list.sort(key = sorting_by_avg, reverse=True)
 
-for category, average in mean_list[:3]:
-    print(category)
+top_categories = [category for category, i in mean_list[:3]]
+print(top_categories)
 
 # Store names and averages of top 10 food categories for plotting (prevents loop from only showing the last item)
 top_10_categories = [category for category, average in mean_list[:10]]
@@ -101,7 +105,7 @@ plt.barh(top_10_categories[::-1], top_10_averages[::-1])
 plt.xlabel('Average Microplastic Consumption (μg/kg)')
 plt.title('Top 10 Food Categories by Microplastic Content')
 plt.tight_layout()
-plt.show()
+plt.savefig("output/average_consumption_top_10.png")
 
 # - Country-Level Totals:
 #     - Which 5 countries have the highest average total_ug_per_kg over the entire period (1990-2018)?
@@ -136,7 +140,7 @@ plt.xlabel("Year")
 plt.ylabel("Microplastic Content (μg/kg)")
 plt.grid(True)
 plt.tight_layout()
-plt.show()
+plt.savefig("output/global_average_fruits.png")
 
 # ## Intermediate Task
 
@@ -156,7 +160,7 @@ plt.ylabel("Total µg/kg")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.show()
+plt.savefig("output/intermediate_food_trends.png")
 
 
 #Create a new dictionary for the results
