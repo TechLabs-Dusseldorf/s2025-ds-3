@@ -6,3 +6,4 @@ venv/
 VSCode - Git.docx
 ~$Code - Git.docx
 *.ipynb
+__pycache__
