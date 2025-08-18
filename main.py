@@ -348,7 +348,7 @@ corr_with_A.sort_values().plot(kind="barh", color="skyblue", edgecolor="black")
 plt.title(f"Correlation of {corr_check_col} with Other Variables")
 plt.xlabel("Correlation Coefficient")
 plt.ylabel("Variables")
-plt.show()
+plt.savefig("output/intermediate_correlation_of_microplastics.png")
 
 
 # ### Public Health Implications & Recommendations (Qualitative):
