@@ -326,9 +326,30 @@ top_drivers_cagr = df_growth_rates.sort_values(["country", "CAGR"], ascending=[T
 # Extract top 3 contributing food categories by slope percentage
 top_drivers_slope = df_growth_rates.sort_values(["country", "slope_percent_per_year"], ascending=[True, False]).groupby("country").head(3)
 
-# - Correlation between Food Groups (Optional/Advanced):
-#     - Is there a correlation between microplastic content in different food groups? For example, do countries with high microplastic in fish also tend to have high microplastic in seafood or processed_foods? Use correlation matrices or scatter plots to explore.
-# 
+"""
+Correlation between Food Groups (Optional/Advanced):
+    - Is there a correlation between microplastic content in different food groups? For example, do countries with high microplastic in fish also tend to have high microplastic in seafood or processed_foods? Use correlation matrices or scatter plots to explore.
+"""
+
+# Get the correlation matrix
+df.corr
+
+# define a vairable with the correlation regardint numerics only.
+corr = df.corr(method='pearson', min_periods=1, numeric_only=True)
+
+# define a variable to check the correlation with regards to it
+corr_check_col = 'total_ug_per_kg'
+
+# Extract correlations with 'A' since it is always 1
+corr_with_A = corr[corr_check_col].drop(corr_check_col)
+
+# Plot as horizontal bar chart, since a vertical bar in this case makes lees sense and is harder on the eyes to follow
+corr_with_A.sort_values().plot(kind="barh", color="skyblue", edgecolor="black")
+plt.title(f"Correlation of {corr_check_col} with Other Variables")
+plt.xlabel("Correlation Coefficient")
+plt.ylabel("Variables")
+plt.show()
+
 
 # ### Public Health Implications & Recommendations (Qualitative):
 # - Based on your findings, what are 2-3 key insights you would present to the PurePlate Initiative regarding microplastic consumption?
