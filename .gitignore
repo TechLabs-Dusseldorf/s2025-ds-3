@@ -7,3 +7,4 @@ VSCode - Git.docx
 ~$Code - Git.docx
 *.ipynb
 __pycache__
+.DS_Store
