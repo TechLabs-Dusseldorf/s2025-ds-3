@@ -16,6 +16,7 @@ import os
 
 if not os.path.exists("output"):
     os.makedirs('output')
+
 #TODO: Use more functions to declutter the code (MD)
 
 # Open the File as a DataFram
@@ -44,7 +45,7 @@ df["country"].unique()
 
 # Print the golabal average total_ug_per_kg
 average = df["total_ug_per_kg"].mean()
-print(average)
+print('The golabal average:', average)
 
 # 1. Import of the libraries we need for visualization
 # 2. I looked up how to do visualization with a website that explains EDA for Python
@@ -70,7 +71,6 @@ for x, y in zip(yearaverage.index, yearaverage.values):
 plt.grid(True)
 plt.tight_layout()
 plt.savefig("output/total_per_year.png")
-
 # - Top Food Contributors:
 #     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
 #     - Visualize the average microplastic content for the top 10 food categories.
@@ -93,7 +93,7 @@ for column in food_columns:
 mean_list.sort(key = sorting_by_avg, reverse=True)
 
 top_categories = [category for category, i in mean_list[:3]]
-print(top_categories)
+print('3 food categories with the most microplastic content:', top_categories)
 
 # Store names and averages of top 10 food categories for plotting (prevents loop from only showing the last item)
 top_10_categories = [category for category, average in mean_list[:10]]
@@ -106,7 +106,6 @@ plt.xlabel('Average Microplastic Consumption (μg/kg)')
 plt.title('Top 10 Food Categories by Microplastic Content')
 plt.tight_layout()
 plt.savefig("output/average_consumption_top_10.png")
-
 # - Country-Level Totals:
 #     - Which 5 countries have the highest average total_ug_per_kg over the entire period (1990-2018)?
 #     - Which 5 countries have the lowest average total_ug_per_kg?
@@ -125,6 +124,7 @@ highest_high_low_countries = df_high_low_countries.head(number_of_high_low_count
 
 lowest_high_low_countries = df_high_low_countries.tail(number_of_high_low_countries)
 
+print('5 countries with the highest average consumption: \n', highest_high_low_countries,'\n 5 countries with the lowest average consumption: \n', lowest_high_low_countries)
 
 # - Initial Time-Series for a Food Category:
 #     - Choose one of the top 3 food categories identified in question 3. How has the microplastic content in this specific food category changed over time (1990-2018) globally? Visualize this trend.
@@ -141,7 +141,6 @@ plt.ylabel("Microplastic Content (μg/kg)")
 plt.grid(True)
 plt.tight_layout()
 plt.savefig("output/global_average_fruits.png")
-
 # ## Intermediate Task
 
 # - Detailed Food Category Analysis:
@@ -161,7 +160,6 @@ plt.grid(True)
 plt.legend()
 plt.tight_layout()
 plt.savefig("output/intermediate_food_trends.png")
-
 
 #Create a new dictionary for the results
 results = {}
@@ -221,6 +219,90 @@ print(change_p_sorted)
 #     - Select two countries with significantly different average total_ug_per_kg (one high, one low, from your beginner analysis).
 #     - For each selected country, visualize the breakdown of total_ug_per_kg by different food categories for the year 2018. Highlight the food categories contributing most to microplastic intake in these specific countries.
 # 
+
+"""
+## We need to limit our data to year of 2018 and only two countries. First I make a new data frame that contains all the data for the year 2018.
+## I decided to get the countries with the highest and lowest averages, which we have from the beginner's questions.
+## I make two other data frames, by restricting df_2018 to those country rows that I need.
+## Then I drop the columns that I don't need (year, country, total_ug_per_kg).
+## I also need to sort the values, but I couldn't simply do it by sort_values(), because I need to sort the data by a column. But here, I have many columns (each food category is one column). So, I need to swap the columns and rows. I do it with melt(). Now I can sort my values. Since this setting won't be saved in the original data, I need to put it into another variable.
+
+"""
+
+# restricing data to the year 2018
+df_2018 = df[df['year']==2018]
+
+# restricting the data to two countries with highest and lowest average consumption (Greece and Bangeladesh)
+df_2018_high_country = df_2018[df_2018['country'] == highest_high_low_countries.index[0]]
+df_2018_low_country = df_2018[df_2018['country'] == lowest_high_low_countries.index[-1]]
+
+# dropping the unwanted columns
+df_foods_high_country = df_2018_high_country.drop(columns = ['year', 'country', 'total_ug_per_kg'])
+df_foods_low_country = df_2018_low_country.drop(columns = ['year', 'country', 'total_ug_per_kg'])
+
+# swapping rows and columns, and sorting the values
+df_long_high = df_foods_high_country.melt()
+df_long_high_sorted = df_long_high.sort_values(by = 'value')
+
+df_long_low = df_foods_low_country.melt()
+df_long_low_sorted = df_long_low.sort_values(by = 'value')
+
+
+"""
+Now I want a bar chart. I put each column into a list, so that I can plot them with plt.bar().
+"""
+
+# preparing x and y axis
+high_country_food_category = df_long_high_sorted['variable']
+high_country_value = df_long_high_sorted['value']
+
+low_country_food_category = df_long_low_sorted['variable']
+low_country_value = df_long_low_sorted['value']
+
+"""
+I want to highlight the food categories contributing most to microplastic intake in these specific countries.
+I decided to highlight those categories with more than 100 ug per kg microplastic content.
+For highlighting specific bars, I found out that I can create a list, containing a color for each bar in my plot.
+But since I don't want to write everything manually, I use a for-loop and if.
+Btw, since I have too many categories on the y-axis, I rotate lables so they don’t overlap.
+"""
+
+#plotting for the country with the highest microplastic intake
+bar_colors_high = []
+
+for v in high_country_value:
+    if v >= 100:
+         bar_colors_high.append('tab:red')
+    else:
+         bar_colors_high.append('tab:blue')
+
+plt.figure(figsize=(12,6))
+plt.bar(high_country_food_category, high_country_value, color=bar_colors_high)
+plt.xticks(rotation=90)
+plt.title("Microplastic breakdown for Greece (2018)")
+plt.xlabel("Food category")
+plt.ylabel("Microplastics (µg/kg)")
+plt.tight_layout()
+plt.savefig("output/microplastic_breakdown_high_country")
+
+#plotting for the country with the lowest microplastic intake
+bar_colors_low = []
+
+for v in low_country_value:
+    if v >= 100:
+         bar_colors_low.append('tab:red')
+    else:
+         bar_colors_low.append('tab:blue')
+
+plt.figure(figsize=(12,6))
+plt.bar(low_country_food_category, low_country_value, color=bar_colors_low)
+plt.xticks(rotation=90)
+plt.title("Microplastic breakdown for Bangladesh (2018)")
+plt.xlabel("Food category")
+plt.ylabel("Microplastics (µg/kg)")
+plt.tight_layout()
+plt.savefig("output/microplastic_breakdown_low_country")
+
 
 # - Growth Rate Analysis:
 #     - Calculate the percentage increase in total_ug_per_kg from 1990 to 2018 for each country. Identify the top 5 countries with the highest growth rate in microplastic consumption.
