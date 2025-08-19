@@ -8,3 +8,4 @@ VSCode - Git.docx
 *.ipynb
 __pycache__
 .DS_Store
+output
