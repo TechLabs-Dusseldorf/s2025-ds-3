@@ -4,6 +4,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
+import os
+
+
+if not os.path.exists("output"):
+    os.makedirs("output")
+
 
 """
 - Data Loading and Initial Exploration:
@@ -66,14 +72,17 @@ def calculate_and_plot_global_average_total_ug_kg(df, year_col, total_ug_per_kg_
 
     return yearly_average
 
+
 """
 - Top Food Contributors:
     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
     - Visualize the average microplastic content for the top 10 food categories.
 """
 
-def calculate_top_n_contaminated_categories(df,n, start_food_col, end_food_col):
+
+def calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col):
     mean_list = []
+
     def sorting_by_avg(key):
         return key[1]
 
@@ -82,7 +91,8 @@ def calculate_top_n_contaminated_categories(df,n, start_food_col, end_food_col):
         mean_list.append([column, df[column].mean()])
     mean_list.sort(key=sorting_by_avg, reverse=True)
     print("Three food categories with the highest microplastic content:", mean_list[:n])
-    return(mean_list)
+    return mean_list
+
 
 def plot_top_n_contaminated_categories(df, n, mean_list):
     top_n_categories = [category for category, average in mean_list[:n]]
@@ -96,7 +106,8 @@ def plot_top_n_contaminated_categories(df, n, mean_list):
     plt.tight_layout()
     plt.savefig("output/average_consumption_top_n_food_categories.png")
 
-    return(top_n_categories)
+    return top_n_categories
+
 
 """
 - Country-Level Totals:
@@ -134,7 +145,7 @@ def highest_lowest_high_low_countries(
         "\n 5 countries with the lowest average consumption: \n",
         lowest_high_low_countries,
     )
-    return(highest_high_low_countries, lowest_high_low_countries)
+    return (highest_high_low_countries, lowest_high_low_countries)
 
 
 """
@@ -178,8 +189,10 @@ Intermediate Tasks
     - For each selected country, visualize the breakdown of total_ug_per_kg by different food categories for the year 2018. Highlight the food categories contributing most to microplastic intake in these specific countries.
 """
 
-def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, specific_year, highest_high_low_countries, lowest_high_low_countries):
 
+def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
+    df, specific_year, highest_high_low_countries, lowest_high_low_countries
+):
     # restricing data to the specific year
     df_specific_year = df[df["year"] == specific_year]
 
@@ -187,7 +200,9 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, 
     df_specific_year_high_country = df_specific_year[
         df_specific_year["country"] == highest_high_low_countries.index[0]
     ]
-    df_specific_year_low_country = df_specific_year[df_specific_year["country"] == lowest_high_low_countries.index[-1]]
+    df_specific_year_low_country = df_specific_year[
+        df_specific_year["country"] == lowest_high_low_countries.index[-1]
+    ]
 
     # dropping the unwanted columns
     df_foods_high_country = df_specific_year_high_country.drop(
@@ -246,7 +261,7 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, 
     plt.ylabel("Microplastics (µg/kg)")
     plt.tight_layout()
     plt.savefig("output/microplastic_breakdown_low_country")
-    
+
 
 """
 - Growth Rate Analysis:
@@ -453,7 +468,6 @@ def main():
     print("\n")
     calculate_and_plot_global_average_total_ug_kg(df, "year", "total_ug_per_kg")
 
-
     print("\n")
     plot_food_category_trend(df, "total_milk")
 
@@ -463,9 +477,9 @@ def main():
 
     # Find out the total per year of all countries together for the top 3 food categories
     # Extract just the column names from the top 3 tuples
-    mean_list = calculate_top_n_contaminated_categories(df,3 ,2, -1)
+    mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1)
     top_3_columns = [category for category, avg in mean_list[:3]]
-    
+
     total_highest = df.groupby("year")[top_3_columns].sum()
 
     # Plot a line chart to visualize the trends of each category
@@ -553,7 +567,9 @@ def main():
     print("\n")
 
     # for the question I already set the parameters, is changeable however to anything one wants.
-    highest_high_low_countries , lowest_high_low_countries = highest_lowest_high_low_countries(df, "total_ug_per_kg", "mean", 5)
+    highest_high_low_countries, lowest_high_low_countries = (
+        highest_lowest_high_low_countries(df, "total_ug_per_kg", "mean", 5)
+    )
 
     # here for the wanted effect I alreasy set the parameters, is changeable however to anything one wants.
     get_correlation_regarding_a_column(df, "pearson", "total_ug_per_kg")
@@ -562,9 +578,10 @@ def main():
 
     plot_top_n_contaminated_categories(df, 10, mean_list)
 
-    visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, 2018, highest_high_low_countries, lowest_high_low_countries)
+    visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
+        df, 2018, highest_high_low_countries, lowest_high_low_countries
+    )
 
 
 if __name__ == "__main__":
     main()
-
