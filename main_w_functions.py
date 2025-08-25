@@ -37,7 +37,45 @@ def load_and_inspect_data(filepath):
 
     return df
 
+def create_lineplot(
+    input_data,
+    title="Line Plot",
+    xlabel="X-axis",
+    ylabel="Y-axis",
+    marker='o'
+):
+    """
+    Create a line plot from a pandas Series or DataFrame with annotations for all lines.
 
+    Parameters:
+        input_data (pd.Series or pd.DataFrame): Data to plot.
+        title (str): Plot title.
+        xlabel (str): Label for x-axis.
+        ylabel (str): Label for y-axis.
+        marker (str): Marker style for plot lines.
+    """
+    ax = input_data.plot(marker=marker, figsize=(10, 6))
+
+    plt.title(title, fontsize=14)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.grid(True)
+
+    # Add annotations for Series
+    if isinstance(input_data, pd.Series):
+        for x, y in zip(input_data.index, input_data.values):
+            plt.text(x, y, f'{y:.1f}', ha='center', va='bottom', fontsize=9)
+
+    # Add annotations for each column in a DataFrame
+    elif isinstance(input_data, pd.DataFrame):
+        for col in input_data.columns:
+            for x, y in zip(input_data.index, input_data[col]):
+                plt.text(x, y, f'{y:.1f}', ha='center', va='bottom', fontsize=8)
+
+        plt.legend(title="Category")
+
+    plt.tight_layout()
+    plt.show()
 """
 Beginner Tasks:
 """
@@ -48,29 +86,28 @@ Beginner Tasks:
     - What is the average total_ug_per_kg across all countries and years in the dataset?
     - How has the global average total_ug_per_kg changed over the years (1990-2018)? Visualize this trend.
 """
+def analyze_and_plot_microplastic_trends(df):
+    """
+    Prints the overall average microplastic content and plots yearly trends.
 
+    Parameters:
+        df (pd.DataFrame): DataFrame containing 'year' and 'total_ug_per_kg' columns.
+    """
+    # 1. Overall average
+    overall_avg = df["total_ug_per_kg"].mean()
+    print(f"\nOverall average total_ug_per_kg across all countries and years: {overall_avg:.2f}\n")
 
-def calculate_and_plot_global_average_total_ug_kg(df, year_col, total_ug_per_kg_col):
-    yearly_average = df.groupby(year_col)[total_ug_per_kg_col].mean()
-    print(
-        "The average total_ug_per_kg across all countries and years is:\n",
-        yearly_average,
+    # 2. Yearly average
+    yearaverage = df.groupby("year")["total_ug_per_kg"].mean()
+
+    # 3. Plot using existing custom function
+    create_lineplot(
+        input_data=yearaverage,
+        title="Average total µg/kg (by Year)",
+        xlabel="Year",
+        ylabel="Average total µg/kg"
     )
 
-    ax = yearly_average.plot(marker="o", figsize=(10, 6))
-    plt.title("Average total µg/kg over years")
-    plt.xlabel("Year")
-    plt.ylabel("Average total µg/kg")
-    plt.grid(True)
-    plt.tight_layout()
-    # Add value annotations on each data point
-    for x, y in zip(yearly_average.index, yearly_average.values):
-        plt.text(x, y + 13, f"{y:.1f}", ha="center", va="bottom", fontsize=12)
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig("output/total_per_year.png")
-
-    return yearly_average
 
 
 """
@@ -182,6 +219,84 @@ Intermediate Tasks
      - Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1991) and latest (2018) years. Describe the shifts in contribution.
 """
 
+def analyze_microplastic_trends(df):
+    mean_list = []
+    def sorting_by_avg(key):
+        return key[1]
+    food_columns = df.columns[2:-1]
+    for column in food_columns:
+        mean_list.append([column, df[column].mean()])
+    mean_list.sort(key = sorting_by_avg, reverse=True)
+    top_categories = [category for category, _ in mean_list[:3]]
+
+    # Find out the total per year of all countries together for the top 3 food categories
+    total_highest = df.groupby("year")[top_categories[0:3]].sum()
+
+    # Plot a line chart to visualize the trends of each category
+    create_lineplot(
+        input_data=total_highest,
+        title="Microplastic Content of Top 3 Food Categories (1990–2018)",
+        xlabel="Year",
+        ylabel="Total µg/kg"
+    )
+
+    # Create a new dictionary for the results
+    results = {}
+
+    # Use slope to calculate the increase
+    for cat in top_categories[0:3]:
+        y = total_highest[cat].values
+        x = total_highest.index.values
+        slope = np.polyfit(x, y, 1)[0]
+        results[cat] = slope
+
+    # Make an order from fastest to slowest increase
+    sorted_results = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
+    for cat, slope in sorted_results.items():
+        print(f"{cat}: {slope:.2f} µg/kg per year")
+
+    print()
+
+    # Print the category with the fastest increase
+    fastest = max(results, key=results.get)
+    print(f"Fastest increase: {fastest} ({results[fastest]:.2f} µg/kg per year)")
+
+    # Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1990) and latest (2018) years
+
+    #Filter the food columns (first 2 columns and last column are no food)
+    food_cols = df.columns[2:-1]
+
+    #Add the contribution of each country together and group only for 1990 and 2018
+    total_cat_year = df.groupby("year")[food_cols].sum().loc[[1990, 2018]]
+    total_per_year =  df.groupby("year")["total_ug_per_kg"].sum().loc[[1990, 2018]]
+
+    #Calculate the contribution of each food to the total per year (1990, 2018) and give out in %
+
+    percentage_dec = total_cat_year.div(total_per_year, axis=0) * 100
+    percentage_p = percentage_dec.applymap(lambda x: f"{x:.2f}%")
+
+    # Extract data for 1990 and 2018 Daten
+    p_1990 = percentage_p.loc[1990].rename("1990")
+    p_2018 = percentage_p.loc[2018].rename("2018")
+
+    # Put them next to each other in comparison 
+    p_compare = pd.concat([p_1990, p_2018], axis=1)
+    print(p_compare)
+
+    # Describe the shifts in contribution / changes
+    change_dec = ((percentage_dec.loc[2018] - percentage_dec.loc[1990]) / percentage_dec.loc[1990]) * 100
+    change_p = change_dec.map(lambda x: f"{x:.2f}%")
+
+    # Sort in decreasing order 
+    change_dec_sorted = change_dec.sort_values(ascending=False)
+    change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
+
+    # Visualize change_p_sorted as a table
+    change_p_sorted_table = pd.DataFrame(change_p_sorted).reset_index()
+    change_p_sorted_table.columns = ['Food Category', 'Percentage Change']
+
+    # Print the table
+    print(change_p_sorted_table)
 
 """
 - Country-Specific Microplastic Profiles:
@@ -466,7 +581,47 @@ def main():
     filepath = sys.argv[1]
     df = load_and_inspect_data(filepath)
     print("\n")
-    calculate_and_plot_global_average_total_ug_kg(df, "year", "total_ug_per_kg")
+    # Extract correlations with 'A' since it is always 1
+    corr_with_A = corr[corr_check_col].drop(corr_check_col)
+
+    # - Top Food Contributors:
+    #     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
+    #     - Visualize the average microplastic content for the top 10 food categories.
+
+    # My roadmap: We calculate the average consumption for each food category. We put the averages and their related category name in a list. Then, I sort the list to get the top three food categories.
+    # First, I need to define which columns are food columns (and not country names, year, and total consumption). I define variable 'food_columns' and put those columns in it.
+    # I can calculate averages for each column. But, I need to save them somewhere, so that I can later compare the numbers. So, I first make a list, called 'mean_list'.
+    # But, at the end I want to have the names of food categories, not the average numbers themselves. I decided to make a tuple, which consists of column names and average consumption.
+    # To add (append) each category and averages to the list, I use a for loop.
+    # I sort this list by using sort() method. But, I need to define a key, such that the list can be sorted by the average numbers. If I don't do this, they will be sorted alphabetically by the category names.
+    # Therefore, I define function sorting_by_avg(). This function returns the second items in our tuples, which are the average numbers.
+    
+    analyze_and_plot_microplastic_trends(df)
+
+    mean_list = []
+
+    def sorting_by_avg(key):
+        return key[1]
+
+    food_columns = df.columns[2:-1]
+    for column in food_columns:
+        mean_list.append((column, df[column].mean()))
+    mean_list.sort(key=sorting_by_avg, reverse=True)
+
+    print("Top 3 food categories:")
+    for category, average in mean_list[:3]:
+        print(f"{category}: {average:.2f} μg/kg")
+
+    top_3_food_categories = mean_list[:3]
+    top_10_categories = [category for category, average in mean_list[:10]]
+    top_10_averages = [average for category, average in mean_list[:10]]
+
+    plt.figure(figsize=(10, 6))
+    plt.barh(top_10_categories[::-1], top_10_averages[::-1])
+    plt.xlabel("Average Microplastic Consumption (μg/kg)")
+    plt.title("Top 10 Food Categories by Microplastic Content")
+    plt.tight_layout()
+    plt.show()
 
     print("\n")
     plot_food_category_trend(df, "total_milk")
@@ -477,77 +632,7 @@ def main():
 
     # Find out the total per year of all countries together for the top 3 food categories
     # Extract just the column names from the top 3 tuples
-    mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1)
-    top_3_columns = [category for category, avg in mean_list[:3]]
-
-    total_highest = df.groupby("year")[top_3_columns].sum()
-
-    # Plot a line chart to visualize the trends of each category
-    ax = total_highest.plot(marker="o", figsize=(10, 6))
-
-    plt.title("Microplastic content (1990-2018)")
-    plt.xlabel("Year")
-    plt.ylabel("Total µg/kg")
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig("output/intermediate_food_trends.png")
-
-    # Create a new dictionary for the results
-    results = {}
-
-    # Use slope to calculate the increase
-    for cat in top_3_columns[0:3]:
-        y = total_highest[cat].values
-        x = total_highest.index.values
-        slope = np.polyfit(x, y, 1)[0]
-        results[cat] = slope
-
-    # Make an order from fastest to slowest increase
-    sorted_results = dict(
-        sorted(results.items(), key=lambda item: item[1], reverse=True)
-    )
-    for cat, slope in sorted_results.items():
-        print(f"{cat}: {slope:.2f} µg/kg per year")
-
-    print()
-
-    # Print the category with the fastest increase
-    fastest = max(results, key=results.get)
-    print(f"Fastest increase: {fastest} ({results[fastest]:.2f} µg/kg per year)")
-
-    # Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1990) and latest (2018) years
-
-    # Filter the food columns (first 2 columns and last column are no food)
-    food_cols = df.columns[2:-1]
-
-    # Add the contribution of each country together and group only for 1990 and 2018
-    total_cat_year = df.groupby("year")[food_cols].sum().loc[[1990, 2018]]
-    total_per_year = df.groupby("year")["total_ug_per_kg"].sum().loc[[1990, 2018]]
-
-    # Calculate the contribution of each food to the total per year (1990, 2018) and give out in %
-
-    percentage_dec = total_cat_year.div(total_per_year, axis=0) * 100
-    percentage_p = percentage_dec.applymap(lambda x: f"{x:.2f}%")
-
-    # Extract data for 1990 and 2018 Daten
-    p_1990 = percentage_p.loc[1990].rename("1990")
-    p_2018 = percentage_p.loc[2018].rename("2018")
-
-    # Put them next to each other in comparison
-    p_compare = pd.concat([p_1990, p_2018], axis=1)
-    print(p_compare)
-
-    # Describe the shifts in contribution / changes
-    change_dec = (
-        (percentage_dec.loc[2018] - percentage_dec.loc[1990]) / percentage_dec.loc[1990]
-    ) * 100
-    change_p = change_dec.map(lambda x: f"{x:.2f}%")
-
-    # Sort in decreasing order
-    change_dec_sorted = change_dec.sort_values(ascending=False)
-    change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
-    print(change_p_sorted)
+    analyze_microplastic_trends(df)
 
     print("\n")
     results = analyze_growth_rate(df)
