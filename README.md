@@ -64,7 +64,7 @@ python main.py run
 Run the Streamlit Web App from the project root directory:
 
 ```bash
-streamlit run home.py
+streamlit run 🌐_Home.py
 ```
 
 ---
