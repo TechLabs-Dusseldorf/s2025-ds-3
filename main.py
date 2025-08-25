@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import datetime
 import os
+import pycountry_convert as pc
 
 
 if not os.path.exists("output"):
@@ -59,15 +60,15 @@ yearaverage = df.groupby("year")["total_ug_per_kg"].mean()
 
 # Plot the line chart
 ax = yearaverage.plot(marker="o", figsize=(10, 6))
-plt.title("Average total µg/kg")
+plt.title("Average Total µg/kg Across All Countries from 1990 to 2018")
 plt.xlabel("Year")
-plt.ylabel("Average total µg/kg")
+plt.ylabel("Average Total µg/kg")
 # Add value annotations
 for x, y in zip(yearaverage.index, yearaverage.values):
     plt.text(x, y, f"{y:.1f}", ha="center", va="bottom", fontsize=9)
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("output/total_per_year.png")
+plt.savefig("output/1_total_per_year.png")
 
 # - Top Food Contributors:
 #     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
@@ -102,7 +103,7 @@ plt.barh(top_10_categories[::-1], top_10_averages[::-1])
 plt.xlabel("Average Microplastic Consumption (μg/kg)")
 plt.title("Top 10 Food Categories by Microplastic Content")
 plt.tight_layout()
-plt.savefig("output/average_consumption_top_10_food_categories.png")
+plt.savefig("output/2_average_consumption_top_10_food_categories.png")
 
 # - Country-Level Totals:
 #     - Which 5 countries have the highest average total_ug_per_kg over the entire period (1990-2018)?
@@ -147,7 +148,7 @@ plt.xlabel("Year")
 plt.ylabel("Microplastic Content (μg/kg)")
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("output/global_average_fruits.png")
+plt.savefig("output/3_global_average_fruits.png")
 
 # ## Intermediate Tasks
 
@@ -162,13 +163,13 @@ total_highest = df.groupby("year")[top_3_columns].sum()
 # Plot a line chart to visualize the trends of each category
 ax = total_highest.plot(marker="o", figsize=(10, 6))
 
-plt.title("Microplastic content (1990-2018)")
+plt.title("Microplastic Content in Top 3 Food Categories with The Highest Microplastic Content(1990-2018)")
 plt.xlabel("Year")
 plt.ylabel("Total µg/kg")
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
-plt.savefig("output/intermediate_food_trends.png")
+plt.savefig("output/4_intermediate_food_trends.png")
 
 # Create a new dictionary for the results
 results = {}
@@ -291,11 +292,11 @@ for v in high_country_value:
 plt.figure(figsize=(12, 6))
 plt.bar(high_country_food_category, high_country_value, color=bar_colors_high)
 plt.xticks(rotation=90)
-plt.title("Microplastic breakdown for Greece (2018)")
-plt.xlabel("Food category")
+plt.title("Microplastic Breakdown for Greece (2018)")
+plt.xlabel("Food Category")
 plt.ylabel("Microplastics (µg/kg)")
 plt.tight_layout()
-plt.savefig("output/microplastic_breakdown_high_country")
+plt.savefig("output/5_microplastic_breakdown_high_country")
 
 # plotting for the country with the lowest microplastic intake
 bar_colors_low = []
@@ -309,11 +310,11 @@ for v in low_country_value:
 plt.figure(figsize=(12, 6))
 plt.bar(low_country_food_category, low_country_value, color=bar_colors_low)
 plt.xticks(rotation=90)
-plt.title("Microplastic breakdown for Bangladesh (2018)")
-plt.xlabel("Food category")
+plt.title("Microplastic Breakdown for Bangladesh (2018)")
+plt.xlabel("Food Category")
 plt.ylabel("Microplastics (µg/kg)")
 plt.tight_layout()
-plt.savefig("output/microplastic_breakdown_low_country")
+plt.savefig("output/6_microplastic_breakdown_low_country")
 
 
 # - Growth Rate Analysis:
@@ -477,12 +478,116 @@ plt.title(f"Correlation of {corr_check_col} with Other Variables")
 plt.xlabel("Correlation Coefficient")
 plt.ylabel("Variables")
 plt.tight_layout()
-plt.savefig("output/intermediate_correlation_of_microplastics.png")
+plt.savefig("output/7_intermediate_correlation_of_microplastics.png")
 
 
-# ### Public Health Implications & Recommendations (Qualitative):
-# - Based on your findings, what are 2-3 key insights you would present to the PurePlate Initiative regarding microplastic consumption?
-# - Propose potential policy recommendations or public awareness strategies that could help reduce human exposure to microplastics through diet, citing evidence from your analysis.
-#
-# > Remember to provide clear visualizations and concise explanations for all your findings. Your analysis will contribute directly to a vital public health discussion!
-#
+## Additional Analysis:
+# I want to investigate whether the contamination in each country is coming from one (or a few) food categories, or is it widespread across categories?
+
+'''
+I will use three concentration metrics:
+1. Mean per category: the average contamination across food groups.
+2. Standard deviation across categories: higher std means big differences between categories, therefore more concentration.
+3. Max share: share of the biggest contributing category.
+'''
+
+# calulating average microplastic content across all food categories for each country
+country_avgs = df.groupby("country")[food_categories].mean()
+
+# caluclating the concentration_metrics
+# setting the axis=1, so it does the calculations for each row (not column)
+concentration_metrics = pd.DataFrame({
+     "mean_per_category": country_avgs.mean(axis=1),
+     "std_per_category": country_avgs.std(axis=1),
+     "max_share": country_avgs.max(axis=1) / country_avgs.sum(axis=1)
+ })
+
+#sorting the results by max share and printing it
+concentration_metrics = concentration_metrics.sort_values("max_share", ascending=False)
+print("\n 10 Countries with most concentrated contamination: \n ", concentration_metrics.head(10))
+print("\n 10 Countries with most widespread contamination: \n", concentration_metrics.tail(10))
+
+'''
+Looking at the results, it seems like those countries in which a single food category has a large share of the total contamination, are African countries.
+I want to investigate this further. I use pycountry_convert library, to get the continent names for each country and group the data by the continents.
+'''
+# I reset the index so that I can work with the names of the countries
+concentration_metrics = concentration_metrics.reset_index()
+
+# I write a function that takes a country name and gives me back the continent
+# to be honest, I wasn't sure which functions from the library to use. so I had to look up that first I need the alpha2 country code(the official two-letter code for a country), and then from there I can get the continent code.
+def get_continent(country):
+    # Some country names in my data don’t match perfectly with the library, so I have to use try/except and return None if it fails
+    try:
+        # First I convert the country name to a 2-letter code (like 'DE' for Germany).
+        code = pc.country_name_to_country_alpha2(country)
+        # Then I convert that code to a continent code (like 'EU' for Europe).
+        return pc.country_alpha2_to_continent_code(code)
+    except:
+        return None
+
+concentration_metrics["continent"] = concentration_metrics["country"].apply(get_continent)
+continent_breakdown = concentration_metrics.groupby("continent")["max_share"].mean().sort_values(ascending=False)
+print('\n Average share of the most contaminated food category for each continent \n', continent_breakdown)
+
+"""
+Now, I want to see which single category has the max share in my top 10 countries.
+I thought I can just loop through them one by one.
+"""
+
+# putting top 10 most concentrated countries into a variable
+top10_countries = concentration_metrics.head(10)["country"]
+
+# I decided to make a dictionary, because I want to store multiple things for each country
+top10_biggest_contributors = {}
+
+for country in top10_countries:
+    # I take the row for that country (all the categories with their values)
+    country_data = country_avgs.loc[country]
+
+    # I wasn’t sure how to find the category with the max value, at first I thought about sorting, but then I learned there is .idxmax() which directly gives the category name
+    top_category = country_data.idxmax()
+
+    # here I just get the actual value of that max contamination
+    top_value = country_data.max()
+
+    # and the sum across all categories (I need this to calculate the share)
+    total_value = country_data.sum()
+
+    share = top_value / total_value
+
+    # I put the results into the dictionary under the country name
+    # I wasn’t sure whether to use a list or dictionary here — I picked dictionary because I want to access results by country name later, not just by position
+    # also rounded the share to make it cleaner
+    top10_biggest_contributors[country] = {
+        "top_category": top_category,
+        "share": round(share, 3),
+        "value": round(top_value, 2)
+    }
+
+# I convert results to a dataframe for a better view
+top10_contributors_df = pd.DataFrame(top10_biggest_contributors).T
+print("\n Top contributors in top 10 most concentrated countries:\n")
+print(top10_contributors_df)
+
+'''
+The result is interesting. Refined grains is the dominant source in 9 out of 10 of the countries with most concentrated pollution.
+I want to check this across all countries. I will count how many times each category is the top contributor.
+'''
+
+# To find the top contributor for each country I again use idxmax() that returns the index for the maximum value in each column
+# By setting the axis to 1, it will do it for each row
+top_category_per_country = country_avgs.idxmax(axis=1)
+
+# Counting frequencies
+top_category_counts = top_category_per_country.value_counts()
+print("\n How often each category is the biggest contributor:\n", top_category_counts)
+
+#Plotting a bar chart: I found out I can work with .plot() and I don't have to put each column into a list (as I used to do when plotting with plt.bar())!
+plt.figure(figsize=(10, 6))
+top_category_counts.plot(kind="bar")
+plt.title("Most Frequent Top Contributors Across Countries")
+plt.ylabel("Number of countries")
+plt.xlabel("Food category")
+plt.tight_layout()
+plt.savefig("output/8_biggest_contributors_count")
