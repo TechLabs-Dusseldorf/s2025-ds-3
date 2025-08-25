@@ -58,7 +58,7 @@ pip install -r requirements.txt
 Run calculations:
 
 ```bash
-python main.py run
+python main.py
 ```
 
 Run the Streamlit Web App from the project root directory:
