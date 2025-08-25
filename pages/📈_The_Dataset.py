@@ -1,4 +1,8 @@
 import streamlit as st
+import pandas as pd
+import pydeck as pdk
+import plotly.express as px
+import pycountry
 
 st.set_page_config(
     page_title="The Dataset", page_icon="📈", layout="centered"
@@ -12,12 +16,55 @@ st.markdown("""
     color: #2e3d49; 
     font-size: 17px; 
     line-height: 1.7;
-    margin-bottom: 25px;
+    margin-bottom: 1px;
 ">
 The dataset used for this analysis was provided by the <strong>PurePlate Initiative</strong>, a global non-profit advocacy group dedicated to promoting food safety and raising awareness about emerging contaminants in the human diet. 
 The initiative focuses on the growing presence of <strong>microplastics in our food</strong> and its potential long-term health implications.
 </p>
 """, unsafe_allow_html=True)
+
+countries = [
+    "Angola", "Benin", "Burkina Faso", "Central African Republic", "Cote D'Ivoire", 
+    "Cameroon", "Congo", "Djibouti", "Algeria", "Egypt", "Ethiopia", "Gabon", 
+    "Ghana", "Guinea", "The Gambia", "Guinea-Bissau", "Kenya", "Lesotho", "Morocco",
+    "Madagascar", "Mali", "Mozambique", "Mauritania", "Mauritius", "Malawi", 
+    "Namibia", "Niger", "Nigeria", "Rwanda", "Senegal", "Chad", "Togo", "Tunisia",
+    "Tanzania", "Uganda", "South Africa", "Zambia", "Zimbabwe", "Albania", "Argentina",
+    "Antigua And Barbuda", "Australia", "Austria", "Bangladesh", "Bulgaria", "Bolivia",
+    "Brazil", "Barbados", "Canada", "Switzerland", "China", "Colombia", "Cuba",
+    "Germany", "Dominica", "Denmark", "Dominican Republic", "Spain", "France",
+    "United Kingdom", "Greece", "Grenada", "Hungary", "Indonesia", "India", "Ireland",
+    "Iran", "Iraq", "Iceland", "Jordan", "Japan", "Cambodia", "South Korea", "Kuwait",
+    "Laos", "Saint Lucia", "Sri Lanka", "Mexico", "Myanmar", "Mongolia", "Malaysia",
+    "Netherlands", "Norway", "Pakistan", "Peru", "Philippines", "Portugal", "Paraguay",
+    "Romania", "Saudi Arabia", "Slovakia", "Sweden", "Thailand", "Trinidad And Tobago",
+    "Turkey", "Uruguay", "United States", "Venezuela", "Vietnam", "Belgium", 
+    "Bosnia And Herzegovina", "Croatia", "Luxembourg", "Montenegro", "Russia", 
+    "Serbia", "Slovenia", "Syria", "Ukraine"
+]
+
+all_countries = [country.name for country in pycountry.countries]
+
+df = pd.DataFrame({
+    "country": all_countries,
+})
+df["highlight"] = df["country"].apply(lambda x: 1 if x in countries else 0)
+
+fig = px.choropleth(
+    df,
+    locations="country",
+    locationmode="country names",
+    color="highlight",
+    hover_name="country",
+    color_continuous_scale=["#eeeeee", "#FF6B6B"],
+)
+fig.update_layout(
+    coloraxis_showscale=False,
+    margin={"r":0,"t":0,"l":0,"b":0}
+)
+fig.update_geos(projection_type="natural earth", fitbounds="locations", visible=False)
+
+st.plotly_chart(fig, use_container_width=True, height=600)
 
 # Stat cards
 def stat_card(title, value, icon=""):
@@ -37,7 +84,7 @@ def stat_card(title, value, icon=""):
     """, unsafe_allow_html=True)
 
 stats = [
-    {"title": "Countries", "value": 120, "icon": "🌍"},
+    {"title": "Countries", "value": 109, "icon": "🌍"},
     {"title": "Food Categories", "value": 18, "icon": "🌽"},
     {"title": "Years of Data", "value": 28, "icon": "⏳"},
 ]
@@ -83,6 +130,7 @@ st.markdown(
     <style>
     div.stDownloadButton > button {
         display: block;
+        font-size: 18px;
         margin: 0 auto;
     }
     </style>
