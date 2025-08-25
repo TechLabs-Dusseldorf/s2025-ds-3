@@ -306,7 +306,6 @@ for v in low_country_value:
     else:
         bar_colors_low.append("tab:blue")
 
-create_lineplot()
 plt.figure(figsize=(12, 6))
 plt.bar(low_country_food_category, low_country_value, color=bar_colors_low)
 plt.xticks(rotation=90)
