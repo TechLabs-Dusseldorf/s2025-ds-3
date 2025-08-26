@@ -22,6 +22,8 @@ The initiative focuses on the growing presence of <strong>microplastics in our f
 </p>
 """, unsafe_allow_html=True)
 
+# World map
+
 countries = [
     "Angola", "Benin", "Burkina Faso", "Central African Republic", "Cote D'Ivoire", 
     "Cameroon", "Congo", "Djibouti", "Algeria", "Egypt", "Ethiopia", "Gabon", 
@@ -54,7 +56,7 @@ fig = px.choropleth(
     locations="country",
     locationmode="country names",
     color="highlight",
-    hover_name="country",  # still useful, but we override the tooltip below
+    hover_name="country",  
     color_continuous_scale=["#eeeeee", "#FF6B6B"],
 )
 
