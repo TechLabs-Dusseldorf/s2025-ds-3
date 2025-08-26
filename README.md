@@ -58,7 +58,7 @@ pip install -r requirements.txt
 Run calculations:
 
 ```bash
-python main.py ./processed_microplastics.de
+python main.py ./processed_microplastics.csv
 ```
 
 Run the Streamlit Web App from the project root directory:
