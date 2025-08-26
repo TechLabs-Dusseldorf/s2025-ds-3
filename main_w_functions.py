@@ -639,6 +639,96 @@ def contamination_in_countries(df: pd.DataFrame) -> None:
     plt.savefig("output/8_biggest_contributors_count")
 
 
+def rank_cagr(df: pd.DataFrame, percentage_dec):
+    """
+    Additional Analysis on this question:
+    1) rank of which categories changed between 1990 and 2018?
+    2) visualization of shares with a stacked area chart
+    3) calculating CAGR for each category (instead of slopes)
+    """
+
+    ## 1) Rank shift analysis
+
+    # needed variables, which are duplicates
+    food_columns = df.columns[2:-1]
+    total_cat_year = df.groupby("year")[food_columns].sum().loc[[1990, 2018]]
+    mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1)
+
+    # Rank food categories by contribution in 1990 and 2018
+    rank_1990 = percentage_dec.loc[1990].rank(ascending=False)
+    rank_2018 = percentage_dec.loc[2018].rank(ascending=False)
+
+    rank_shift = (rank_1990 - rank_2018).sort_values()
+
+    print(
+        "\n Rank shifts (Positive numbers show that the category has gained a higher share of the total, and vice versa.): \n\n",
+        rank_shift,
+    )
+
+    ## 2) Stacked area chart for shares over time
+
+    # I want to see how each food category's share changes over time.
+    # First I group the data by year and sum up the values for each category
+    shares_over_time = df.groupby("year")[food_columns].sum()
+
+    # I realized these are absolute totals, and I want percentages. So, I divide each row by the row sum (total across all food categories for that year).
+    shares_over_time = shares_over_time.div(shares_over_time.sum(axis=1), axis=0) * 100
+
+    # Now I can make a stacked area chart. I tried line plot first, but it looked messy since all categories overlapped.
+    shares_over_time.plot.area(figsize=(12, 6), alpha=0.7)
+    plt.title("Evolution of Food Category Shares (1990–2018)")
+    plt.ylabel("Share of Total (%)")
+    plt.xlabel("Year")
+    plt.tight_layout()
+    plt.savefig("output/food_category_shares_over_time.png")
+
+    ## 3) Calculating CAGR
+
+    cagr_results = {}
+    for cat in food_columns:
+        first = total_cat_year.loc[1990, cat]
+        last = total_cat_year.loc[2018, cat]
+        years = 2018 - 1990
+        cagr = ((last / first) ** (1 / years) - 1) * 100
+        cagr_results[cat] = cagr
+
+    cagr_sorted = pd.Series(cagr_results).sort_values(ascending=False)
+    print("\n\n Compound Annual Growth Rate (CAGR) 1990–2018 (%):\n\n", cagr_sorted)
+
+    # Making a nice summary of all data for better viewing
+    summary = pd.DataFrame(
+        {
+            "1990 Share": percentage_dec.loc[1990],
+            "2018 Share": percentage_dec.loc[2018],
+            "Rank 1990": rank_1990,
+            "Rank 2018": rank_2018,
+            "Rank Change": rank_1990 - rank_2018,
+            "CAGR %": pd.Series(cagr_results),
+        }
+    ).sort_values("CAGR %", ascending=False)
+
+    print("\n\n Which categories are overtaking the other?\n\n ", summary)
+
+    # for the question I already set the parameters, is changeable however to anything one wants.
+    highest_high_low_countries, lowest_high_low_countries = (
+        highest_lowest_high_low_countries(df, "total_ug_per_kg", "mean", 5)
+    )
+
+    # here for the wanted effect I already set the parameters, is changeable however to anything one wants.
+    get_correlation_regarding_a_column(df, "pearson", "total_ug_per_kg")
+
+    # calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col)
+    calculate_top_n_contaminated_categories(df, 3, 2, -1)
+
+    # plot_top_n_contaminated_categories(df, n, mean_list)
+    plot_top_n_contaminated_categories(df, 10, mean_list)
+
+    # visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, specific_year, highest_high_low_countries, lowest_high_low_countries)
+    visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
+        df, 2018, highest_high_low_countries, lowest_high_low_countries
+    )
+
+
 # ### Public Health Implications & Recommendations (Qualitative):
 # - Based on your findings, what are 2-3 key insights you would present to the PurePlate Initiative regarding microplastic consumption?
 # - Propose potential policy recommendations or public awareness strategies that could help reduce human exposure to microplastics through diet, citing evidence from your analysis.
@@ -762,88 +852,8 @@ def main():
     print(results["top_drivers_slope"])
     print("\n")
 
-    """
-    Additional Analysis on this question:
-    1) rank of which categories changed between 1990 and 2018?
-    2) visualization of shares with a stacked area chart
-    3) calculating CAGR for each category (instead of slopes)
-    """
-
-    ## 1) Rank shift analysis
-
-    # Rank food categories by contribution in 1990 and 2018
-    rank_1990 = percentage_dec.loc[1990].rank(ascending=False)
-    rank_2018 = percentage_dec.loc[2018].rank(ascending=False)
-
-    rank_shift = (rank_1990 - rank_2018).sort_values()
-
-    print(
-        "\n Rank shifts (Positive numbers show that the category has gained a higher share of the total, and vice versa.): \n\n",
-        rank_shift,
-    )
-
-    ## 2) Stacked area chart for shares over time
-
-    # I want to see how each food category's share changes over time.
-    # First I group the data by year and sum up the values for each category
-    shares_over_time = df.groupby("year")[food_columns].sum()
-
-    # I realized these are absolute totals, and I want percentages. So, I divide each row by the row sum (total across all food categories for that year).
-    shares_over_time = shares_over_time.div(shares_over_time.sum(axis=1), axis=0) * 100
-
-    # Now I can make a stacked area chart. I tried line plot first, but it looked messy since all categories overlapped.
-    shares_over_time.plot.area(figsize=(12, 6), alpha=0.7)
-    plt.title("Evolution of Food Category Shares (1990–2018)")
-    plt.ylabel("Share of Total (%)")
-    plt.xlabel("Year")
-    plt.tight_layout()
-    plt.savefig("output/food_category_shares_over_time.png")
-
-    ## 3) Calculating CAGR
-
-    cagr_results = {}
-    for cat in food_columns:
-        first = total_cat_year.loc[1990, cat]
-        last = total_cat_year.loc[2018, cat]
-        years = 2018 - 1990
-        cagr = ((last / first) ** (1 / years) - 1) * 100
-        cagr_results[cat] = cagr
-
-    cagr_sorted = pd.Series(cagr_results).sort_values(ascending=False)
-    print("\n\n Compound Annual Growth Rate (CAGR) 1990–2018 (%):\n\n", cagr_sorted)
-
-    # Making a nice summary of all data for better viewing
-    summary = pd.DataFrame(
-        {
-            "1990 Share": percentage_dec.loc[1990],
-            "2018 Share": percentage_dec.loc[2018],
-            "Rank 1990": rank_1990,
-            "Rank 2018": rank_2018,
-            "Rank Change": rank_1990 - rank_2018,
-            "CAGR %": pd.Series(cagr_results),
-        }
-    ).sort_values("CAGR %", ascending=False)
-
-    print("\n\n Which categories are overtaking the other?\n\n ", summary)
-
-    # for the question I already set the parameters, is changeable however to anything one wants.
-    highest_high_low_countries, lowest_high_low_countries = (
-        highest_lowest_high_low_countries(df, "total_ug_per_kg", "mean", 5)
-    )
-
-    # here for the wanted effect I already set the parameters, is changeable however to anything one wants.
-    get_correlation_regarding_a_column(df, "pearson", "total_ug_per_kg")
-
-    # calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col)
-    calculate_top_n_contaminated_categories(df, 3, 2, -1)
-
-    # plot_top_n_contaminated_categories(df, n, mean_list)
-    plot_top_n_contaminated_categories(df, 10, mean_list)
-
-    # visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, specific_year, highest_high_low_countries, lowest_high_low_countries)
-    visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
-        df, 2018, highest_high_low_countries, lowest_high_low_countries
-    )
+    contamination_in_countries(df)
+    rank_cagr(df, percentage_dec)
 
 
 if __name__ == "__main__":
