@@ -698,7 +698,7 @@ def main():
 
     # Put them next to each other in comparison
     p_compare = pd.concat([p_1990, p_2018], axis=1)
-    print(p_compare)
+    print("\n The share of each food category in the total microplastic contamination: \n", p_compare)
 
     # Describe the shifts in contribution / changes
     change_dec = (
@@ -709,7 +709,7 @@ def main():
     # Sort in decreasing order
     change_dec_sorted = change_dec.sort_values(ascending=False)
     change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
-    print(change_p_sorted)
+    print('\n The growth rate in contribution share from 1990 to 2018: \n ', change_p_sorted)
 
     print("\n")
     results = analyze_growth_rate(df)
