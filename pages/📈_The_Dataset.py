@@ -138,7 +138,7 @@ st.markdown(
 )
 
 st.download_button(
-    label="📥 Download the Dataset",
+    label="📥 Download the dataset",
     data=csv_data,
     file_name="microplastics_dataset.csv",
     mime="text/csv"
