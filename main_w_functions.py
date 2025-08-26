@@ -647,7 +647,7 @@ def main():
     # Plot a line chart to visualize the trends of each category
     ax = total_highest.plot(marker="o", figsize=(10, 6))
 
-    plt.title("Microplastic Content in Top 3 Food Categories with The Highest Microplastic Content (1990-2018)")
+    plt.title("Microplastic Content in 3 Food Categories with The Highest Contamination (1990-2018)")
     plt.xlabel("Year")
     plt.ylabel("Total µg/kg")
     plt.grid(True)
@@ -690,7 +690,7 @@ def main():
     # Calculate the contribution of each food to the total per year (1990, 2018) and give out in %
 
     percentage_dec = total_cat_year.div(total_per_year, axis=0) * 100
-    percentage_p = percentage_dec.applymap(lambda x: f"{x:.2f}%")
+    percentage_p = percentage_dec.map(lambda x: f"{x:.2f}%")
 
     # Extract data for 1990 and 2018 Daten
     p_1990 = percentage_p.loc[1990].rename("1990")
