@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import sys
 import os
+import pycountry_convert as pc
+
 
 
 if not os.path.exists("output"):
@@ -58,9 +60,9 @@ def calculate_and_plot_global_average_total_ug_kg(df, year_col, total_ug_per_kg_
     )
 
     ax = yearly_average.plot(marker="o", figsize=(10, 6))
-    plt.title("Average total µg/kg over years")
+    plt.title("Average Total µg/kg Across All Countries from 1990 to 2018")
     plt.xlabel("Year")
-    plt.ylabel("Average total µg/kg")
+    plt.ylabel("Average Total µg/kg")
     plt.grid(True)
     plt.tight_layout()
     # Add value annotations on each data point
@@ -68,7 +70,7 @@ def calculate_and_plot_global_average_total_ug_kg(df, year_col, total_ug_per_kg_
         plt.text(x, y + 13, f"{y:.1f}", ha="center", va="bottom", fontsize=12)
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("output/total_per_year.png")
+    plt.savefig("output/1_total_per_year.png")
 
     return yearly_average
 
@@ -77,6 +79,15 @@ def calculate_and_plot_global_average_total_ug_kg(df, year_col, total_ug_per_kg_
 - Top Food Contributors:
     - Which 3 food categories (product columns, e.g., fish, poultry, vegetables) show the highest average microplastic consumption (μg/kg) across all countries and years?
     - Visualize the average microplastic content for the top 10 food categories.
+"""
+
+"""
+My roadmap: We calculate the average consumption for each food category. We put the averages and their related category name in a list. Then, I sort the list to get the top three food categories.
+First, I need to define which columns are food columns (and not country names, year, and total consumption). I define variable 'food_columns' and put those columns in it.
+I can calculate averages for each column. But, I need to save them somewhere, so that I can later compare the numbers. So, I first make a list, called 'mean_list'.
+To add (append) each category and averages to the list, I use a for loop.
+I sort this list by using sort() method. But, I need to define a key, such that the list can be sorted by the average numbers. If I don't do this, they will be sorted alphabetically by the category names.
+Therefore, I define function sorting_by_avg(). This function returns the second items in our tuples, which are the average numbers.
 """
 
 
@@ -90,11 +101,12 @@ def calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col)
     for column in food_columns:
         mean_list.append([column, df[column].mean()])
     mean_list.sort(key=sorting_by_avg, reverse=True)
-    print("Three food categories with the highest microplastic content:", mean_list[:n])
+    print("\nThree food categories with the highest microplastic content: \n", mean_list[:n])
     return mean_list
 
 
 def plot_top_n_contaminated_categories(df, n, mean_list):
+    # Store names and averages of top n food categories for plotting (prevents loop from only showing the last item)
     top_n_categories = [category for category, average in mean_list[:n]]
     top_n_averages = [average for category, average in mean_list[:n]]
 
@@ -104,7 +116,7 @@ def plot_top_n_contaminated_categories(df, n, mean_list):
     plt.xlabel("Average Microplastic Consumption (μg/kg)")
     plt.title("Top Food Categories by Microplastic Content")
     plt.tight_layout()
-    plt.savefig("output/average_consumption_top_n_food_categories.png")
+    plt.savefig("output/2_average_consumption_top_n_food_categories.png")
 
     return top_n_categories
 
@@ -142,7 +154,7 @@ def highest_lowest_high_low_countries(
     print(
         "5 countries with the highest average consumption: \n",
         highest_high_low_countries,
-        "\n 5 countries with the lowest average consumption: \n",
+        "\n\n 5 countries with the lowest average consumption: \n",
         lowest_high_low_countries,
     )
     return (highest_high_low_countries, lowest_high_low_countries)
@@ -168,7 +180,7 @@ def plot_food_category_trend(df, food_category_col):
     plt.ylabel("Microplastic Content (μg/kg)")
     plt.grid(True)
     plt.tight_layout()
-    plt.savefig("output/global_average_one_category.png")
+    plt.savefig("output/3_global_average_one_category.png")
 
 
 """
@@ -187,6 +199,15 @@ Intermediate Tasks
 - Country-Specific Microplastic Profiles:
     - Select two countries with significantly different average total_ug_per_kg (one high, one low, from your beginner analysis).
     - For each selected country, visualize the breakdown of total_ug_per_kg by different food categories for the year 2018. Highlight the food categories contributing most to microplastic intake in these specific countries.
+"""
+
+"""
+## My roadmap:
+  We need to limit our data to year of 2018 and only two countries. First I make a new data frame that contains all the data for the year 2018.
+  I decided to get the countries with the highest and lowest averages, which we have from the beginner's questions.
+  I make two other data frames, by restricting df_2018 to those country rows that I need.
+  Then I drop the columns that I don't need (year, country, total_ug_per_kg).
+  I also need to sort the values, but I couldn't simply do it by sort_values(), because I need to sort the data by a column. But here, I have many columns (each food category is one column). So, I need to swap the columns and rows. I do it with melt(). Now I can sort my values. Since this setting won't be saved in the original data, I need to put it into another variable.
 """
 
 
@@ -219,6 +240,10 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
     df_long_low = df_foods_low_country.melt()
     df_long_low_sorted = df_long_low.sort_values(by="value")
 
+
+    """
+    Now I want a bar chart. I put each column into a list, so that I can plot them with plt.bar().
+    """
     # preparing x and y axis for the bar chart
     high_country_food_category = df_long_high_sorted["variable"]
     high_country_value = df_long_high_sorted["value"]
@@ -226,6 +251,14 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
     low_country_food_category = df_long_low_sorted["variable"]
     low_country_value = df_long_low_sorted["value"]
 
+
+    """
+    I want to highlight the food categories contributing most to microplastic intake in these specific countries.
+    I decided to highlight those categories with more than 100 ug per kg microplastic content.
+    For highlighting specific bars, I found out that I can create a list, containing a color for each bar in my plot.
+    But since I don't want to write everything manually, I use a for-loop and if.
+    Btw, since I have too many categories on the y-axis, I rotate lables so they don’t overlap.
+    """
     # plotting for the country with the highest microplastic intake
     bar_colors_high = []
 
@@ -238,11 +271,11 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
     plt.figure(figsize=(12, 6))
     plt.bar(high_country_food_category, high_country_value, color=bar_colors_high)
     plt.xticks(rotation=90)
-    plt.title("Microplastic breakdown for Greece (2018)")
-    plt.xlabel("Food category")
+    plt.title("Microplastic Breakdown for Greece (2018)")
+    plt.xlabel("Food Category")
     plt.ylabel("Microplastics (µg/kg)")
     plt.tight_layout()
-    plt.savefig("output/microplastic_breakdown_high_country")
+    plt.savefig("output/5_microplastic_breakdown_high_country")
 
     # plotting for the country with the lowest microplastic intake
     bar_colors_low = []
@@ -256,11 +289,140 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
     plt.figure(figsize=(12, 6))
     plt.bar(low_country_food_category, low_country_value, color=bar_colors_low)
     plt.xticks(rotation=90)
-    plt.title("Microplastic breakdown for Bangladesh (2018)")
-    plt.xlabel("Food category")
+    plt.title("Microplastic Breakdown for Bangladesh (2018)")
+    plt.xlabel("Food Category")
     plt.ylabel("Microplastics (µg/kg)")
     plt.tight_layout()
-    plt.savefig("output/microplastic_breakdown_low_country")
+    plt.savefig("output/6_microplastic_breakdown_low_country")
+    
+    
+    """ 
+    -- Additional Analysis --
+    I was thinking we could add one more perspective on the country-level results.
+    Right now we look at total_ug_per_kg (the sum across categories), which tells us the overall exposure risk.
+    But if we also compute the average per category and the spread between categories (e.g., standard deviation or share of the largest category),
+    we can distinguish between two situations:
+    Situation a) Countries where microplastic contamination is concentrated in just one or two categories (e.g., almost everything comes from fish).
+    Situation b) Countries where contamination is more evenly spread across many categories (so the risk is systemic).
+
+    This would give us a clearer picture of whether high totals are due to a single problematic food group or a general baseline contamination across the whole diet.
+    """
+
+    # Question: Is the contamination in each country coming from one (or a few) food categories, or is it widespread across categories?
+
+    '''
+    We will use three concentration metrics:
+    1. Mean per category: the average contamination across food groups.
+    2. Standard deviation across categories: higher std means big differences between categories, therefore more concentration.
+    3. Max share: share of the biggest contributing category.
+    '''
+
+    food_categories = [
+        col for col in df.columns if col not in ["country", "year", "total_ug_per_kg"]
+    ]
+
+    # calulating average microplastic content across all food categories for each country
+    country_avgs = df.groupby("country")[food_categories].mean()
+
+    # caluclating the concentration_metrics
+    # setting the axis=1, so it does the calculations for each row (not column)
+    concentration_metrics = pd.DataFrame({
+        "mean_per_category": country_avgs.mean(axis=1),
+        "std_per_category": country_avgs.std(axis=1),
+        "max_share": country_avgs.max(axis=1) / country_avgs.sum(axis=1)
+    })
+
+    #sorting the results by max share and printing it
+    concentration_metrics = concentration_metrics.sort_values("max_share", ascending=False)
+    print("\n 10 Countries with most concentrated contamination: \n ", concentration_metrics.head(10))
+    print("\n 10 Countries with most widespread contamination: \n", concentration_metrics.tail(10))
+
+    '''
+    Looking at the results, it seems like those countries in which a single food category has a large share of the total contamination, are African countries.
+    I want to investigate this further. I use pycountry_convert library, to get the continent names for each country and group the data by the continents.
+    '''
+    # I reset the index so that I can work with the names of the countries
+    concentration_metrics = concentration_metrics.reset_index()
+
+    # I write a function that takes a country name and gives me back the continent
+    # to be honest, I wasn't sure which functions from the library to use. so I had to look up that first I need the alpha2 country code(the official two-letter code for a country), and then from there I can get the continent code.
+    def get_continent(country):
+        # Some country names in my data don’t match perfectly with the library, so I have to use try/except and return None if it fails
+        try:
+            # First I convert the country name to a 2-letter code (like 'DE' for Germany).
+            code = pc.country_name_to_country_alpha2(country)
+            # Then I convert that code to a continent code (like 'EU' for Europe).
+            return pc.country_alpha2_to_continent_code(code)
+        except:
+            return None
+
+    concentration_metrics["continent"] = concentration_metrics["country"].apply(get_continent)
+    continent_breakdown = concentration_metrics.groupby("continent")["max_share"].mean().sort_values(ascending=False)
+    print('\n Average share of the most contaminated food category for each continent \n', continent_breakdown)
+
+    """
+    Now, I want to see which single category has the max share in my top 10 countries.
+    I thought I can just loop through them one by one.
+    """
+
+    # putting top 10 most concentrated countries into a variable
+    top10_countries = concentration_metrics.head(10)["country"]
+
+    # I decided to make a dictionary, because I want to store multiple things for each country
+    top10_biggest_contributors = {}
+
+    for country in top10_countries:
+        # I take the row for that country (all the categories with their values)
+        country_data = country_avgs.loc[country]
+
+        # I wasn’t sure how to find the category with the max value, at first I thought about sorting, but then I learned there is .idxmax() which directly gives the category name
+        top_category = country_data.idxmax()
+
+        # here I just get the actual value of that max contamination
+        top_value = country_data.max()
+
+        # and the sum across all categories (I need this to calculate the share)
+        total_value = country_data.sum()
+
+        share = top_value / total_value
+
+        # I put the results into the dictionary under the country name
+        # I wasn’t sure whether to use a list or dictionary here — I picked dictionary because I want to access results by country name later, not just by position
+        # also rounded the share to make it cleaner
+        top10_biggest_contributors[country] = {
+            "top_category": top_category,
+            "share": round(share, 3),
+            "value": round(top_value, 2)
+        }
+
+    # I convert results to a dataframe for a better view
+    top10_contributors_df = pd.DataFrame(top10_biggest_contributors).T
+    print("\n Top contributors in top 10 most concentrated countries:\n")
+    print(top10_contributors_df)
+
+    '''
+    The result is interesting. Refined grains is the dominant source in 9 out of 10 of the countries with most concentrated pollution.
+    I want to check this across all countries. I will count how many times each category is the top contributor.
+    '''
+
+    # To find the top contributor for each country I again use idxmax() that returns the index for the maximum value in each column
+    # By setting the axis to 1, it will do it for each row
+    top_category_per_country = country_avgs.idxmax(axis=1)
+
+    # Counting frequencies
+    top_category_counts = top_category_per_country.value_counts()
+    print("\n How often each category is the biggest contributor:\n", top_category_counts)
+
+    #Plotting a bar chart: I found out I can work with .plot() and I don't have to put each column into a list (as I used to do when plotting with plt.bar())!
+    plt.figure(figsize=(10, 6))
+    top_category_counts.plot(kind="bar")
+    plt.title("Most Frequent Top Contributors Across Countries")
+    plt.ylabel("Number of countries")
+    plt.xlabel("Food category")
+    plt.tight_layout()
+    plt.savefig("output/8_biggest_contributors_count")
+
+
 
 
 """
@@ -446,7 +608,7 @@ def get_correlation_regarding_a_column(
     plt.xlabel("Correlation Coefficient")
     plt.ylabel("Variables")
     plt.tight_layout()
-    plt.savefig("output/intermediate_correlation_of_microplastics.png")
+    plt.savefig("output/7_intermediate_correlation_of_microplastics.png")
 
     return None
 
@@ -485,13 +647,13 @@ def main():
     # Plot a line chart to visualize the trends of each category
     ax = total_highest.plot(marker="o", figsize=(10, 6))
 
-    plt.title("Microplastic content (1990-2018)")
+    plt.title("Microplastic Content in Top 3 Food Categories with The Highest Microplastic Content (1990-2018)")
     plt.xlabel("Year")
     plt.ylabel("Total µg/kg")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
-    plt.savefig("output/intermediate_food_trends.png")
+    plt.savefig("output/4_intermediate_food_trends.png")
 
     # Create a new dictionary for the results
     results = {}
@@ -571,13 +733,16 @@ def main():
         highest_lowest_high_low_countries(df, "total_ug_per_kg", "mean", 5)
     )
 
-    # here for the wanted effect I alreasy set the parameters, is changeable however to anything one wants.
+    # here for the wanted effect I already set the parameters, is changeable however to anything one wants.
     get_correlation_regarding_a_column(df, "pearson", "total_ug_per_kg")
 
+    # calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col)
     calculate_top_n_contaminated_categories(df, 3, 2, -1)
 
+    # plot_top_n_contaminated_categories(df, n, mean_list)
     plot_top_n_contaminated_categories(df, 10, mean_list)
 
+    # visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(df, specific_year, highest_high_low_countries, lowest_high_low_countries)
     visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
         df, 2018, highest_high_low_countries, lowest_high_low_countries
     )
