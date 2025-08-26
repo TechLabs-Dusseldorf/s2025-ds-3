@@ -54,13 +54,19 @@ fig = px.choropleth(
     locations="country",
     locationmode="country names",
     color="highlight",
-    hover_name="country",
+    hover_name="country",  # still useful, but we override the tooltip below
     color_continuous_scale=["#eeeeee", "#FF6B6B"],
 )
+
 fig.update_layout(
     coloraxis_showscale=False,
-    margin={"r":0,"t":0,"l":0,"b":0}
+    margin={"r": 0, "t": 0, "l": 0, "b": 0}
 )
+
+fig.update_traces(
+    hovertemplate="%{location}<extra></extra>"
+)
+
 fig.update_geos(projection_type="natural earth", fitbounds="locations", visible=False)
 
 st.plotly_chart(fig, use_container_width=True, height=600)
