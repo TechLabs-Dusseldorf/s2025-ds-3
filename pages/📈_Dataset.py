@@ -2,12 +2,13 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import pycountry
+from streamlit.components.v1 import html
 
 st.set_page_config(
-    page_title="The Dataset", page_icon="📈", layout="centered"
+    page_title="Dataset", page_icon="📈", layout="centered"
 )
 
-st.title("📈 The Dataset")
+st.title("📈 Our Dataset")
 
 st.markdown("""
 <p style="
@@ -15,15 +16,45 @@ st.markdown("""
     color: #2e3d49; 
     font-size: 17px; 
     line-height: 1.7;
-    margin-bottom: 1px;
+    margin-bottom: 26px;
 ">
 The dataset used for this analysis was provided by the <strong>PurePlate Initiative</strong>, a global non-profit advocacy group dedicated to promoting food safety and raising awareness about emerging contaminants in the human diet. 
-The initiative focuses on the growing presence of <strong>microplastics in our food</strong> and its potential long-term health implications.
+The initiative focuses on the growing presence of <strong>microplastics in our food</strong> and their potential long-term health implications. 
+The dataset includes information spanning from 1990 to 2018.
 </p>
 """, unsafe_allow_html=True)
 
-# World map
+# Stat cards
+def stat_card(title, value, icon="", subtitle=""):
+    st.markdown(f"""
+    <div style="
+        background-color: #fffafa; 
+        padding: 20px 0; 
+        border-radius: 12px; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+        margin-bottom: 30px;
+    ">
+        <div style="font-size: 28px;">{icon} {value}</div>
+        <div style="font-size: 14px; color: #555;">{title}</div>
+        {f'<div style="font-size: 12px; color: #888; margin-top:4px;">{subtitle}</div>' if subtitle else ''}
+    </div>
+    """, unsafe_allow_html=True)
 
+
+stats = [
+    {"title": "Countries", "value": 109, "icon": "🌍"},
+    {"title": "Food Categories", "value": 18, "icon": "🌽"},
+    {"title": "Years of Data", "value": 28, "icon": "⏳"},
+]
+
+cols = st.columns(len(stats), gap="medium")
+for col, stat in zip(cols, stats):
+    with col:
+        stat_card(stat['title'], stat['value'], stat.get('icon', ""), stat.get('subtitle', ""))
+
+# World map
 countries = [
     "Angola", "Benin", "Burkina Faso", "Central African Republic", "Cote D'Ivoire", 
     "Cameroon", "Congo", "Djibouti", "Algeria", "Egypt", "Ethiopia", "Gabon", 
@@ -73,38 +104,42 @@ fig.update_geos(projection_type="natural earth", fitbounds="locations", visible=
 
 st.plotly_chart(fig, use_container_width=True, height=600)
 
-# Stat cards
-def stat_card(title, value, icon=""):
-    st.markdown(f"""
-    <div style="
-        background-color: #fffafa; 
-        padding: 20px 0; 
-        border-radius: 12px; 
-        box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-        text-align: center;
-        font-family: 'Arial', sans-serif;
-        margin-bottom: 30px;
-    ">
-        <div style="font-size: 28px;">{icon} {value}</div>
-        <div style="font-size: 14px; color: #555;">{title}</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-stats = [
-    {"title": "Countries", "value": 109, "icon": "🌍"},
-    {"title": "Food Categories", "value": 18, "icon": "🌽"},
-    {"title": "Years of Data", "value": 28, "icon": "⏳"},
-]
-
-cols = st.columns(len(stats), gap="medium")
-for col, stat in zip(cols, stats):
-    with col:
-        stat_card(stat['title'], stat['value'], stat['icon'])
-
 file_path = "./processed_microplastics.csv"
 
 with open(file_path, "rb") as f:
     csv_data = f.read()
+
+CARD_STYLE = (
+    "background-color:#fffafa; padding:18px; border-radius:12px; "
+    "box-shadow:0 4px 8px rgba(0,0,0,0.05); text-align:center; "
+    "font-family:Arial, sans-serif; min-width:140px; flex:0 0 auto; margin:5px;"
+)
+
+food_emojis = [
+    ("🧀", "Cheese"), ("🥣", "Yoghurt"), ("🥛", "Milk"),
+    ("🍎", "Fruits"), ("🍞", "Refined Grains"), ("🌾", "Whole Grains"),
+    ("🥜", "Nuts & Seeds"), ("🌭", "Processed Meats"), ("🥩", "Red Meats"),
+    ("🐟", "Fish"), ("🦐", "Shellfish"), ("🥚", "Eggs"),
+    ("🧂", "Salt"), ("🍬", "Added Sugars"), ("🥦", "Vegetables"),
+    ("🥔", "Potatoes"), ("🌽", "Starchy Veg"), ("🫘", "Beans & Legumes"),
+]
+
+cards_html = "".join(
+    f'<div style="{CARD_STYLE}">'
+    f'  <div style="font-size:26px; margin-bottom:6px;">{icon}</div>'
+    f'  <div style="font-size:14px; color:#555;">{label}</div>'
+    f'</div>'
+    for icon, label in food_emojis
+)
+
+html(f"""
+<div style="font-family:Arial, sans-serif;">
+  <div style="display:flex; gap:10px; overflow-x:auto; padding:6px 0 12px 0; 
+              scroll-behavior:smooth; -webkit-overflow-scrolling:touch;">
+    {cards_html}
+  </div>
+</div>
+""", height=170)
 
 # Audience callouts
 st.markdown("""
