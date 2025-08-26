@@ -8,6 +8,7 @@ import os
 import pycountry_convert as pc
 
 
+df = pd.read_csv("processed_microplastics.csv")
 
 if not os.path.exists("output"):
     os.makedirs("output")
@@ -40,6 +41,47 @@ def load_and_inspect_data(filepath):
     return df
 
 
+def create_lineplot(
+    input_data,
+    png_title,
+    title="Line Plot",
+    xlabel="X-axis",
+    ylabel="Y-axis",
+    marker='o'
+):
+    """
+    Create a line plot from a pandas Series or DataFrame with annotations for all lines.
+
+    Parameters:
+        input_data (pd.Series or pd.DataFrame): Data to plot.
+        title (str): Plot title.
+        xlabel (str): Label for x-axis.
+        ylabel (str): Label for y-axis.
+        marker (str): Marker style for plot lines.
+    """
+    ax = input_data.plot(marker=marker, figsize=(10, 6))
+
+    plt.title(title, fontsize=14)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.grid(True)
+
+    # Add annotations for Series
+    if isinstance(input_data, pd.Series):
+        for x, y in zip(input_data.index, input_data.values):
+            plt.text(x, y, f'{y:.1f}', ha='center', va='bottom', fontsize=9)
+
+    # Add annotations for each column in a DataFrame
+    elif isinstance(input_data, pd.DataFrame):
+        for col in input_data.columns:
+            for x, y in zip(input_data.index, input_data[col]):
+                plt.text(x, y, f'{y:.1f}', ha='center', va='bottom', fontsize=8)
+
+        plt.legend(title="Category")
+
+    plt.tight_layout()
+    plt.savefig(png_title)
+
 """
 Beginner Tasks:
 """
@@ -52,28 +94,28 @@ Beginner Tasks:
 """
 
 
-def calculate_and_plot_global_average_total_ug_kg(df, year_col, total_ug_per_kg_col):
-    yearly_average = df.groupby(year_col)[total_ug_per_kg_col].mean()
-    print(
-        "The average total_ug_per_kg across all countries and years is:\n",
-        yearly_average,
+def analyze_and_plot_microplastic_trends(df):
+    """
+    Prints the overall average microplastic content and plots yearly trends.
+
+    Parameters:
+        df (pd.DataFrame): DataFrame containing 'year' and 'total_ug_per_kg' columns.
+    """
+    # 1. Overall average
+    overall_avg = df["total_ug_per_kg"].mean()
+    print(f"\nOverall average total_ug_per_kg across all countries and years: {overall_avg:.2f}\n")
+
+    # 2. Yearly average
+    yearaverage = df.groupby("year")["total_ug_per_kg"].mean()
+
+    # 3. Plot using existing custom function
+    create_lineplot(
+        input_data=yearaverage,
+        png_title="output/1_total_ug_kg_year.png",
+        title="Average total µg/kg (by Year)",
+        xlabel="Year",
+        ylabel="Average total µg/kg"
     )
-
-    ax = yearly_average.plot(marker="o", figsize=(10, 6))
-    plt.title("Average Total µg/kg Across All Countries from 1990 to 2018")
-    plt.xlabel("Year")
-    plt.ylabel("Average Total µg/kg")
-    plt.grid(True)
-    plt.tight_layout()
-    # Add value annotations on each data point
-    for x, y in zip(yearly_average.index, yearly_average.values):
-        plt.text(x, y + 13, f"{y:.1f}", ha="center", va="bottom", fontsize=12)
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig("output/1_total_per_year.png")
-
-    return yearly_average
-
 
 """
 - Top Food Contributors:
@@ -193,6 +235,152 @@ Intermediate Tasks
      - For the top 3 food categories with the highest microplastic content, analyze their individual trends over time (1990-2018). Are some increasing more rapidly than others?
      - Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1991) and latest (2018) years. Describe the shifts in contribution.
 """
+
+
+
+def analyze_microplastic_trends(df, mean_list, top_n_categories):
+    mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1)
+    top_n_categories = plot_top_n_contaminated_categories(df, 3, mean_list)
+    # Find out the total per year of all countries together for the top 3 food categories
+    total_highest = df.groupby("year")[top_n_categories[0:3]].sum()
+
+    # Plot a line chart to visualize the trends of each category
+    create_lineplot(
+        input_data=total_highest,
+        png_title="output/4_analyze_microplastic_trends.png",
+        title="Microplastic Content of Top 3 Food Categories (1990–2018)",
+        xlabel="Year",
+        ylabel="Total µg/kg"
+    )
+
+    # Create a new dictionary for the results
+    results = {}
+
+    # Use slope to calculate the increase
+    for cat in top_n_categories[0:3]:
+        y = total_highest[cat].values
+        x = total_highest.index.values
+        slope = np.polyfit(x, y, 1)[0]
+        results[cat] = slope
+
+    # Make an order from fastest to slowest increase
+    sorted_results = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
+    for cat, slope in sorted_results.items():
+        print(f"{cat}: {slope:.2f} µg/kg per year")
+
+    print()
+
+    # Print the category with the fastest increase
+    fastest = max(results, key=results.get)
+    print(f"Fastest increase: {fastest} ({results[fastest]:.2f} µg/kg per year)")
+
+    # Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1990) and latest (2018) years
+
+    #Filter the food columns (first 2 columns and last column are no food)
+    food_columns = df.columns[2:-1]
+
+    #Add the contribution of each country together and group only for 1990 and 2018
+    total_cat_year = df.groupby("year")[food_columns].sum().loc[[1990, 2018]]
+    total_per_year =  df.groupby("year")["total_ug_per_kg"].sum().loc[[1990, 2018]]
+
+    #Calculate the contribution of each food to the total per year (1990, 2018) and give out in %
+
+    percentage_dec = total_cat_year.div(total_per_year, axis=0) * 100
+    percentage_p = percentage_dec.applymap(lambda x: f"{x:.2f}%")
+
+    # Extract data for 1990 and 2018 Daten
+    p_1990 = percentage_p.loc[1990].rename("1990")
+    p_2018 = percentage_p.loc[2018].rename("2018")
+
+    # Put them next to each other in comparison 
+    p_compare = pd.concat([p_1990, p_2018], axis=1)
+    print(p_compare)
+
+    # Describe the shifts in contribution / changes
+    change_dec = ((percentage_dec.loc[2018] - percentage_dec.loc[1990]) / percentage_dec.loc[1990]) * 100
+    change_p = change_dec.map(lambda x: f"{x:.2f}%")
+
+    # Sort in decreasing order 
+    change_dec_sorted = change_dec.sort_values(ascending=False)
+    change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
+
+    # Visualize change_p_sorted as a table
+    change_p_sorted_table = pd.DataFrame(change_p_sorted).reset_index()
+    change_p_sorted_table.columns = ['Food Category', 'Percentage Change']
+
+    # Print the table
+    print(change_p_sorted_table)
+    
+    '''
+    Additional Analysis on this question:
+    1) rank of which categories changed between 1990 and 2018?
+    2) visualization of shares with a stacked area chart
+    3) calculating CAGR for each category (instead of slopes)
+    '''
+
+    ## 1) Rank shift analysis
+    # Rank food categories by contribution in 1990 and 2018
+    rank_1990 = percentage_dec.loc[1990].rank(ascending=False)
+    rank_2018 = percentage_dec.loc[2018].rank(ascending=False)
+   
+
+
+
+
+
+    # Rank food categories by contribution in 1990 and 2018
+    rank_1990 = percentage_dec.loc[1990].rank(ascending=False)
+    rank_2018 = percentage_dec.loc[2018].rank(ascending=False)
+
+    rank_shift = (rank_1990 - rank_2018).sort_values()
+
+    print("\n Rank shifts (Positive numbers show that the category has gained a higher share of the total, and vice versa.): \n\n", rank_shift)
+
+    ## 2) Stacked area chart for shares over time
+
+    # I want to see how each food category's share changes over time.
+    # First I group the data by year and sum up the values for each category
+    shares_over_time = df.groupby("year")[food_columns].sum()
+
+    # I realized these are absolute totals, and I want percentages. So, I divide each row by the row sum (total across all food categories for that year).
+    shares_over_time = shares_over_time.div(shares_over_time.sum(axis=1), axis=0) * 100
+
+    # Now I can make a stacked area chart. I tried line plot first, but it looked messy since all categories overlapped.
+    shares_over_time.plot.area(figsize=(12, 6), alpha=0.7)
+    plt.title("Evolution of Food Category Shares (1990–2018)")
+    plt.ylabel("Share of Total (%)")
+    plt.xlabel("Year")
+    plt.tight_layout()
+    plt.savefig("output/9_food_category_shares_over_time.png")
+
+    ## 3) Calculating CAGR
+
+    cagr_results = {}
+    for cat in food_columns:
+        first = total_cat_year.loc[1990, cat]
+        last = total_cat_year.loc[2018, cat]
+        years = 2018 - 1990
+        cagr = ((last / first) ** (1/years) - 1) * 100
+        cagr_results[cat] = cagr
+
+    cagr_sorted = pd.Series(cagr_results).sort_values(ascending=False)
+    print("\n\n Compound Annual Growth Rate (CAGR) 1990–2018 (%):\n\n", cagr_sorted)
+
+    # Making a nice summary of all data for better viewing
+    summary = pd.DataFrame({
+        "1990 Share": percentage_dec.loc[1990],
+        "2018 Share": percentage_dec.loc[2018],
+        "Rank 1990": rank_1990,
+        "Rank 2018": rank_2018,
+        "Rank Change": rank_1990 - rank_2018,
+        "CAGR %": pd.Series(cagr_results)
+    }).sort_values("CAGR %", ascending=False)
+
+    print("\n\n Which categories are overtaking the other?\n\n ", summary)
+
+
+
+
 
 
 """
@@ -628,10 +816,12 @@ def main():
     filepath = sys.argv[1]
     df = load_and_inspect_data(filepath)
     print("\n")
-    calculate_and_plot_global_average_total_ug_kg(df, "year", "total_ug_per_kg")
+    analyze_and_plot_microplastic_trends(df)
 
     print("\n")
     plot_food_category_trend(df, "total_milk")
+
+   
 
     # - Detailed Food Category Analysis:
     #     - For the top 3 food categories with the highest microplastic content, analyze their individual trends over time (1990-2018). Are some increasing more rapidly than others?
@@ -639,77 +829,11 @@ def main():
 
     # Find out the total per year of all countries together for the top 3 food categories
     # Extract just the column names from the top 3 tuples
+    
     mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1)
-    top_3_columns = [category for category, avg in mean_list[:3]]
+    top_n_categories = plot_top_n_contaminated_categories(df, 3, mean_list)
 
-    total_highest = df.groupby("year")[top_3_columns].sum()
-
-    # Plot a line chart to visualize the trends of each category
-    ax = total_highest.plot(marker="o", figsize=(10, 6))
-
-    plt.title("Microplastic Content in 3 Food Categories with The Highest Contamination (1990-2018)")
-    plt.xlabel("Year")
-    plt.ylabel("Total µg/kg")
-    plt.grid(True)
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig("output/4_intermediate_food_trends.png")
-
-    # Create a new dictionary for the results
-    results = {}
-
-    # Use slope to calculate the increase
-    for cat in top_3_columns[0:3]:
-        y = total_highest[cat].values
-        x = total_highest.index.values
-        slope = np.polyfit(x, y, 1)[0]
-        results[cat] = slope
-
-    # Make an order from fastest to slowest increase
-    sorted_results = dict(
-        sorted(results.items(), key=lambda item: item[1], reverse=True)
-    )
-    for cat, slope in sorted_results.items():
-        print(f"{cat}: {slope:.2f} µg/kg per year")
-
-    print()
-
-    # Print the category with the fastest increase
-    fastest = max(results, key=results.get)
-    print(f"Fastest increase: {fastest} ({results[fastest]:.2f} µg/kg per year)")
-
-    # Compare the contribution of different food categories to the total_ug_per_kg in the earliest (1990) and latest (2018) years
-
-    # Filter the food columns (first 2 columns and last column are no food)
-    food_columns = df.columns[2:-1]
-
-    # Add the contribution of each country together and group only for 1990 and 2018
-    total_cat_year = df.groupby("year")[food_columns].sum().loc[[1990, 2018]]
-    total_per_year = df.groupby("year")["total_ug_per_kg"].sum().loc[[1990, 2018]]
-
-    # Calculate the contribution of each food to the total per year (1990, 2018) and give out in %
-
-    percentage_dec = total_cat_year.div(total_per_year, axis=0) * 100
-    percentage_p = percentage_dec.map(lambda x: f"{x:.2f}%")
-
-    # Extract data for 1990 and 2018 Daten
-    p_1990 = percentage_p.loc[1990].rename("1990")
-    p_2018 = percentage_p.loc[2018].rename("2018")
-
-    # Put them next to each other in comparison
-    p_compare = pd.concat([p_1990, p_2018], axis=1)
-    print("\n The share of each food category in the total microplastic contamination: \n", p_compare)
-
-    # Describe the shifts in contribution / changes
-    change_dec = (
-        (percentage_dec.loc[2018] - percentage_dec.loc[1990]) / percentage_dec.loc[1990]
-    ) * 100
-    change_p = change_dec.map(lambda x: f"{x:.2f}%")
-
-    # Sort in decreasing order
-    change_dec_sorted = change_dec.sort_values(ascending=False)
-    change_p_sorted = change_dec_sorted.map(lambda x: f"{x:.2f}%")
-    print('\n The growth rate in contribution share from 1990 to 2018: \n ', change_p_sorted)
+    analyze_microplastic_trends(df, mean_list, top_n_categories)
 
     print("\n")
     results = analyze_growth_rate(df)
@@ -729,64 +853,7 @@ def main():
     print("\n")
 
 
-    '''
-    Additional Analysis on this question:
-    1) rank of which categories changed between 1990 and 2018?
-    2) visualization of shares with a stacked area chart
-    3) calculating CAGR for each category (instead of slopes)
-    '''
 
-    ## 1) Rank shift analysis
-
-    # Rank food categories by contribution in 1990 and 2018
-    rank_1990 = percentage_dec.loc[1990].rank(ascending=False)
-    rank_2018 = percentage_dec.loc[2018].rank(ascending=False)
-
-    rank_shift = (rank_1990 - rank_2018).sort_values()
-
-    print("\n Rank shifts (Positive numbers show that the category has gained a higher share of the total, and vice versa.): \n\n", rank_shift)
-
-    ## 2) Stacked area chart for shares over time
-
-    # I want to see how each food category's share changes over time.
-    # First I group the data by year and sum up the values for each category
-    shares_over_time = df.groupby("year")[food_columns].sum()
-
-    # I realized these are absolute totals, and I want percentages. So, I divide each row by the row sum (total across all food categories for that year).
-    shares_over_time = shares_over_time.div(shares_over_time.sum(axis=1), axis=0) * 100
-
-    # Now I can make a stacked area chart. I tried line plot first, but it looked messy since all categories overlapped.
-    shares_over_time.plot.area(figsize=(12, 6), alpha=0.7)
-    plt.title("Evolution of Food Category Shares (1990–2018)")
-    plt.ylabel("Share of Total (%)")
-    plt.xlabel("Year")
-    plt.tight_layout()
-    plt.savefig("output/food_category_shares_over_time.png")
-
-    ## 3) Calculating CAGR
-
-    cagr_results = {}
-    for cat in food_columns:
-        first = total_cat_year.loc[1990, cat]
-        last = total_cat_year.loc[2018, cat]
-        years = 2018 - 1990
-        cagr = ((last / first) ** (1/years) - 1) * 100
-        cagr_results[cat] = cagr
-
-    cagr_sorted = pd.Series(cagr_results).sort_values(ascending=False)
-    print("\n\n Compound Annual Growth Rate (CAGR) 1990–2018 (%):\n\n", cagr_sorted)
-
-    # Making a nice summary of all data for better viewing
-    summary = pd.DataFrame({
-        "1990 Share": percentage_dec.loc[1990],
-        "2018 Share": percentage_dec.loc[2018],
-        "Rank 1990": rank_1990,
-        "Rank 2018": rank_2018,
-        "Rank Change": rank_1990 - rank_2018,
-        "CAGR %": pd.Series(cagr_results)
-    }).sort_values("CAGR %", ascending=False)
-
-    print("\n\n Which categories are overtaking the other?\n\n ", summary)
 
 
     # for the question I already set the parameters, is changeable however to anything one wants.
