@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import pycountry
 from streamlit.components.v1 import html
+from pathlib import Path
 
 st.set_page_config(
     page_title="Dataset", page_icon="📈", layout="centered"
@@ -104,7 +105,8 @@ fig.update_geos(projection_type="natural earth", fitbounds="locations", visible=
 
 st.plotly_chart(fig, use_container_width=True, height=600)
 
-file_path = "./processed_microplastics.csv"
+project_root = Path(__file__).resolve().parents[1]
+file_path = project_root / "processed_microplastics.csv"
 
 with open(file_path, "rb") as f:
     csv_data = f.read()
