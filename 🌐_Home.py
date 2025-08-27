@@ -39,9 +39,38 @@ st.markdown("<hr>", unsafe_allow_html=True)
 # Closing Section
 st.markdown(
     """
-    <div style="font-size: 1rem; color: #353535; font-family: Arial, sans-serif;">
+    <div style="font-size: 1rem; color: #353535; font-family: Arial, sans-serif; margin-bottom: 0;">
         <p style="text-align: center;">This project is designed to grow as new research emerges and public awareness evolves.</p>
-        <p style="font-style: italic; margin-top: -0.3rem; text-align: center;">🗺️ Dive into the data. Reflect. Question. Advocate. 🍽️</p>
+        <p style="font-style: italic; margin-top: -0.3rem; text-align: center; margin-bottom: 0;">🗺️ Dive into the data. Reflect. Question. Advocate. 🍽️</p>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
+# Contributors Section
+st.markdown(
+    """
+    <style>
+        .contrib-link {
+            text-decoration: none;
+            color: #1a73e8; /* blue tone */
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .contrib-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+    <div style="margin-top: 0.2rem; text-align: center; font-family: Arial, sans-serif;">
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e0e0e0;">
+        <p style="font-size: 1rem; color: #555;">🤝 Contributors</p>
+        <p style="font-size: 1rem;">
+            <a class="contrib-link" href="https://github.com/NeginDs" target="_blank">Negin</a> ·
+            <a class="contrib-link" href="https://github.com/Nicolem99" target="_blank">Nicole</a> ·
+            <a class="contrib-link" href="https://github.com/Humam-Hamdan" target="_blank">Humam</a> ·
+            <a class="contrib-link" href="https://github.com/Bionema" target="_blank">Gaetano</a>
+        </p>
     </div>
     """,
     unsafe_allow_html=True,
