@@ -20,7 +20,7 @@ st.markdown("<hr>", unsafe_allow_html=True)
 # Intro
 st.markdown(
     """
-    <div style="font-size: 1.05rem; line-height: 1.7; color: #353535; font-family: Arial, sans-serif;">
+    <div style="font-size: 17px; line-height: 1.7; color: #353535; font-family: Arial, sans-serif;">
         <p><strong>PureData</strong> is a data-driven companion to the <strong>PurePlate Initiative</strong> — an effort to explore the hidden presence of <em>microplastics</em> in our diets and their potential health impact.</p>
         <p>This dashboard presents findings from research and modeling based on global consumption data. You're invited to explore:</p>
         <ul>
