@@ -216,9 +216,10 @@ def highest_lowest_high_low_countries(
 
 
 def plot_food_category_trend(df, food_category_col):
-    # Group by year and calculate mean for the specified food category
+    # Group df by year and calculate mean for the specified food category
     trend_data = df.groupby("year")[food_category_col].mean().reset_index()
 
+    # Create plot
     plt.figure(figsize=(10, 6))
     sns.lineplot(data=trend_data, x="year", y=food_category_col, marker="o")
     plt.title(
@@ -498,7 +499,7 @@ def visualize_breakdown_for_highest_and_lowest_countries_in_a_specific_year(
 def analyze_growth_rate(
     df, start_year=None, end_year=2018, top_n_countries=5, top_n_food_categories=3
 ):
-    # Determine earliest year per country if start_year not provided
+    # Determine earliest year per country if start_year not provided, since not all countries provide data for 1990
     if start_year is None:
         first_year = (
             df.groupby("country")["year"].min().rename("first_year").reset_index()
@@ -544,7 +545,12 @@ def analyze_growth_rate(
 
     # Merge for growth calculation
     df_growth = pd.merge(df_first, df_last, on="country")
-    df_growth["period_years"] = df_growth["year_y"] - df_growth["year_x"]
+
+    # Rename for clarity
+    df_growth = df_growth.rename(columns={"year_x": "starting_year", "year_y": "finishing_year"})
+
+    # Now compute period length
+    df_growth["period_years"] = df_growth["finishing_year"] - df_growth["starting_year"]
 
     # CAGR calculation with safety checks to avoid division by zero
     df_growth["growth_rate"] = np.where(
@@ -566,7 +572,7 @@ def analyze_growth_rate(
         col for col in df.columns if col not in ["country", "year", "total_ug_per_kg"]
     ]
 
-    # Prepare results container
+    # Prepare results container, used to collect the stats below
     results = []
 
     for country in top_countries:
@@ -635,6 +641,7 @@ def analyze_growth_rate(
         .head(top_n_food_categories)
     )
 
+    # Return dict with stats
     return {
         "top_countries_growth": top_growth,
         "top_drivers_cagr": top_drivers_cagr,
