@@ -144,6 +144,7 @@ def calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col)
         return key[1]
 
     food_columns = df.columns[start_food_col:end_food_col]
+    # HERE IS THE ERROR!
     for column in food_columns:
         mean_list.append([column, df[column].mean()])
     mean_list.sort(key=sorting_by_avg, reverse=True)
@@ -547,7 +548,9 @@ def analyze_growth_rate(
     df_growth = pd.merge(df_first, df_last, on="country")
 
     # Rename for clarity
-    df_growth = df_growth.rename(columns={"year_x": "starting_year", "year_y": "finishing_year"})
+    df_growth = df_growth.rename(
+        columns={"year_x": "starting_year", "year_y": "finishing_year"}
+    )
 
     # Now compute period length
     df_growth["period_years"] = df_growth["finishing_year"] - df_growth["starting_year"]
