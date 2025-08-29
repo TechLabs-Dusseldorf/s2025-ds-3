@@ -4,10 +4,21 @@ st.set_page_config(
     page_title="PureData | Microplastics in Food", page_icon="🍴", layout="centered"
 )
 
+# Logo
+st.markdown(
+    """
+    <div style="text-align: center; padding-top: 1rem;">
+        <img src="https://raw.githubusercontent.com/TechLabs-Dusseldorf/s2025-ds-3/main/images/group_logo.png" 
+             alt="PurePlate Logo" width="300" height="300">
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+
 # Title
 st.markdown(
     """
-    <div style="text-align: center; padding-top: 2rem; font-family: Arial, sans-serif;">
+    <div style="text-align: center; padding-top: 1rem; font-family: Arial, sans-serif;">
         <h1 style="font-size: 3rem; color: #2f3e46; font-family: Arial, sans-serif;">🥄 PureData</h1>
         <h3 style="color: #2f3e46; font-weight: 400; font-family: Arial, sans-serif;">A Look at Microplastics in Our Food</h3>
     </div>
