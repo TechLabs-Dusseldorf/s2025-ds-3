@@ -1,9 +1,11 @@
-<p align="center">
+<p align="center" style="margin-bottom: 0;">
   <img src="https://raw.githubusercontent.com/TechLabs-Dusseldorf/s2025-ds-3/main/images/group_logo.png" 
-       alt="PurePlate Logo" width="200"/>
+       alt="PurePlate Logo" width="280" style="margin: 0;"/>
 </p>
 
-# Group 3 — Summer 2025 Microplastics Analysis
+<h1 align="center" style="margin-top: 10px; margin-bottom: 10px;">
+  Group 3 — Summer 2025 Microplastics Analysis
+</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
