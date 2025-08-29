@@ -1,3 +1,8 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/TechLabs-Dusseldorf/s2025-ds-3/main/images/group_logo.png" 
+       alt="PurePlate Logo" width="200"/>
+</p>
+
 # Group 3 — Summer 2025 Microplastics Analysis
 
 <p align="center">
