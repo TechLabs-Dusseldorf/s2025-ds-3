@@ -7,6 +7,8 @@ import sys
 import os
 import pycountry_convert as pc
 
+pd.set_option("display.max_columns", None)
+pd.set_option("display.width", 1000)
 
 df = pd.read_csv("processed_microplastics.csv")
 
@@ -137,21 +139,19 @@ Therefore, I define function sorting_by_avg(). This function returns the second 
 """
 
 
-def calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col):
+def calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col, verbose=True):
     mean_list = []
 
     def sorting_by_avg(key):
         return key[1]
 
     food_columns = df.columns[start_food_col:end_food_col]
-    # HERE IS THE ERROR!
+   
     for column in food_columns:
-        mean_list.append([column, df[column].mean()])
+        mean_list.append([column, float(df[column].mean())])
     mean_list.sort(key=sorting_by_avg, reverse=True)
-    print(
-        "\nThree food categories with the highest microplastic content: \n",
-        mean_list[:n],
-    )
+    if verbose:
+        print("\nThree food categories with the highest microplastic content: \n", mean_list[:n])
     return mean_list
 
 
@@ -304,6 +304,7 @@ def analyze_microplastic_trends(df, mean_list, top_n_categories):
 
     # Put them next to each other in comparison
     p_compare = pd.concat([p_1990, p_2018], axis=1)
+    print("\n Microplastic Contribution per Food Category (1990 vs. 2018):\n")
     print(p_compare)
 
     # Describe the shifts in contribution / changes
@@ -321,6 +322,7 @@ def analyze_microplastic_trends(df, mean_list, top_n_categories):
     change_p_sorted_table.columns = ["Food Category", "Percentage Change"]
 
     # Print the table
+    print("\n Percentage Change in Food Category Contribution (1990 → 2018):\n")
     print(change_p_sorted_table)
 
     """
@@ -868,7 +870,7 @@ def main():
     # Find out the total per year of all countries together for the top 3 food categories
     # Extract just the column names from the top 3 tuples
 
-    mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1)
+    mean_list = calculate_top_n_contaminated_categories(df, 3, 2, -1, verbose=False)
     top_n_categories = plot_top_n_contaminated_categories(df, 3, mean_list)
 
     analyze_microplastic_trends(df, mean_list, top_n_categories)
@@ -899,7 +901,7 @@ def main():
     get_correlation_regarding_a_column(df, "pearson", "total_ug_per_kg")
 
     # calculate_top_n_contaminated_categories(df, n, start_food_col, end_food_col)
-    calculate_top_n_contaminated_categories(df, 3, 2, -1)
+    calculate_top_n_contaminated_categories(df, 3, 2, -1, verbose=False)
 
     # plot_top_n_contaminated_categories(df, n, mean_list)
     plot_top_n_contaminated_categories(df, 10, mean_list)
