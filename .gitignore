@@ -12,3 +12,4 @@ output
 readme.bak
 Pipfile
 Pipfile.lock
+.venv/
