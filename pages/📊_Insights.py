@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import pycountry
 import io
 
 
@@ -56,9 +57,6 @@ def load_and_inspect_data(filepath):
 
     return df
 
-# ---------------------------
-# Section 1: Data Loading
-# ---------------------------
 insight_section(
     "Data Loading and Initial Exploration",
     "📂",
@@ -68,9 +66,6 @@ insight_section(
 # Replace with actual df.head()
 load_and_inspect_data("processed_microplastics.csv")
 
-# ---------------------------
-# Section 2: Overall Trends
-# ---------------------------
 insight_section(
     "Overall Trends in Microplastic Consumption",
     "📉",
@@ -93,9 +88,6 @@ Microplastic contamination in our food is visibly rising, the overall average co
 
 display_chart("output/1_total_ug_kg_year.png")
 
-# ---------------------------
-# Section 3: High-Risk Food Categories
-# ---------------------------
 insight_section(
     "High-Risk Food Categories",
     "🥫",
@@ -168,11 +160,16 @@ st.markdown("""
     line-height: 1.7;
 ">
 When we compare how different food categories contributed to total microplastic intake in 1990 and 2018, at first glance, there seems to be a shift in the story. Two of the three categories with the highest average contamination (refined grains and milk) have actually lost share since 1990.
-<ul style="margin-left:20px;">
+<ul style="
+    margin-left:20px; 
+    font-size: 17px; 
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+    line-height: 1.7;
+">
     <li><strong>Milk</strong> fell from 17.18% to 13.24%, the steepest drop of any category (−17.1%).</li>
     <li><strong>Refined grains</strong> slipped from 20.36% to 19.03% (−6.5%).</li>
 </ul>
-</p>
 """, unsafe_allow_html=True)
 
 st.markdown("""
@@ -244,64 +241,431 @@ In other words, while shares have shifted slightly, the hierarchy of contaminati
 
 display_chart("output/9_food_category_shares_over_time.png")
 
-# ---------------------------
-# Section 4: Geographic Variations
-# ---------------------------
 insight_section(
     "Geographical Variations in Microplastic Intake",
     "🌍",
     "Microplastic exposure differs widely across countries and regions."
 )
 
-#st.write("➡️ 5 countries with highest and lowest average intake")
-#col1, col2 = st.columns(2)
-#with col1: placeholder_table("Top 5 countries")
-#with col2: placeholder_table("Lowest 5 countries")
+st.subheader("➡️ Record setters in average consumption")
 
-#placeholder_chart("World map of average intake by country")
+## World map for countries with the highest and lowest average microplastic contamination
 
-#st.markdown("#### Country-Specific Profiles (2018)")
-#col1, col2 = st.columns(2)
-#with col1: placeholder_chart("Figure #5: Country A breakdown (2018)")
-#with col2: placeholder_chart("Figure #6: Country B breakdown (2018)")
+# Top 10 highest average consumption
+top_10 = [
+    "Greece", "Montenegro", "Dominica", "Barbados", "Albania",
+    "Bosnia And Herzegovina", "Turkey", "United States",
+    "Ukraine", "Netherlands"
+]
 
-#st.markdown("#### Growth Rate Analysis")
-#placeholder_table("Top 5 countries with highest growth rate (1990–2018)")
-#placeholder_table("Food categories driving growth")
+# Bottom 10 lowest average consumption
+bottom_10 = [
+    "Djibouti", "Myanmar", "Cambodia", "Zimbabwe", "Ethiopia",
+    "The Gambia", "Guinea-Bissau", "Burkina Faso", "Chad", "Bangladesh"
+]
 
-#st.markdown("#### Concentration vs Widespread Contamination")
-#col1, col2 = st.columns(2)
-#with col1: placeholder_table("10 Countries with most concentrated contamination")
-#with col2: placeholder_table("10 Countries with most widespread contamination")
-#placeholder_table("Average share of most contaminated food category per continent")
-#placeholder_chart("Figure #8: Contamination distribution across categories")
+# All recognized country names from pycountry
+all_countries = [country.name for country in pycountry.countries]
 
-# ---------------------------
-# Section 5: Correlation (Optional)
-# ---------------------------
+# Create dataframe
+df = pd.DataFrame({"country": all_countries})
+
+# Add highlight categories
+def classify_country(x):
+    if x in top_10:
+        return "High (Top 10)"
+    elif x in bottom_10:
+        return "Low (Bottom 10)"
+    else:
+        return "Other"
+
+df["highlight"] = df["country"].apply(classify_country)
+
+# Color mapping: grey = others, red = high, blue = low
+color_map = {
+    "Other": "#eeeeee",
+    "High (Top 10)": "#FF6B6B",
+    "Low (Bottom 10)": "#4C9AFF"
+}
+
+fig = px.choropleth(
+    df,
+    locations="country",
+    locationmode="country names",
+    color="highlight",
+    hover_name="country",
+    color_discrete_map=color_map
+)
+
+fig.update_layout(
+    legend_title_text="Microplastic Level",
+    margin={"r": 0, "t": 0, "l": 0, "b": 0}
+)
+
+fig.update_traces(
+    hovertemplate="%{location}<extra></extra>"
+)
+
+fig.update_geos(projection_type="natural earth", fitbounds="locations", visible=False)
+
+st.plotly_chart(fig, use_container_width=True, height=600)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown('<p style="text-align:center; font-size:16px; font-weight:bold;">5 Countries with Lowest Average Consumption</p>', unsafe_allow_html=True)
+    st.markdown("""
+    <table style="font-family: Arial, sans-serif; border-collapse: collapse; width: 100%;">
+        <tr style="background-color:#f2f2f2;">
+            <th style="border: 1px solid #ddd; padding: 8px;">Country</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Average Consumption</th>
+        </tr>
+        <tr><td>The Gambia</td><td>746.80</td></tr>
+        <tr><td>Guinea-Bissau</td><td>738.99</td></tr>
+        <tr><td>Burkina Faso</td><td>726.80</td></tr>
+        <tr><td>Chad</td><td>717.14</td></tr>
+        <tr><td>Bangladesh</td><td>634.60</td></tr>
+    </table>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown('<p style="text-align:center; font-size:16px; font-weight:bold;">5 Countries with Highest Average Consumption</p>', unsafe_allow_html=True)
+    st.markdown("""
+    <table style="font-family: Arial, sans-serif; border-collapse: collapse; width: 100%;">
+        <tr style="background-color:#f2f2f2;">
+            <th style="border: 1px solid #ddd; padding: 8px;">Country</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Average Consumption</th>
+        </tr>
+        <tr><td>Greece</td><td>2844.98</td></tr>
+        <tr><td>Montenegro</td><td>2601.90</td></tr>
+        <tr><td>Dominica</td><td>2584.91</td></tr>
+        <tr><td>Barbados</td><td>2504.98</td></tr>
+        <tr><td>Albania</td><td>2454.38</td></tr>
+    </table>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
+st.markdown("## Geographical Patterns and Possible Explanations")
+st.markdown("""
+<div style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+">
+<p>When comparing countries with the highest and lowest average microplastic contamination, certain patterns emerge that may point to underlying causes.</p>
+
+<p><strong>1. Marine Geography</strong><br>
+Many of the highest-consuming countries are located around semi-enclosed or enclosed seas such as the Mediterranean, Black Sea, and Caribbean. These waters have limited circulation, which may allow plastics to accumulate more than in open oceans.<br>
+In contrast, several of the lowest-consuming countries are either landlocked (e.g., Chad, Burkina Faso, Ethiopia) or situated on coastlines linked to more open seas (e.g., Bay of Bengal, Gulf of Thailand), where pollutants may disperse more widely.</p>
+
+<p><strong>2. Industrialization and Trade</strong><br>
+Industrial and highly connected economies (e.g., the Netherlands, the United States, and Turkey) appear among the high-consumption group. This could reflect greater levels of plastic production, waste generation, and shipping activity, which are known sources of microplastics.<br>
+Many of the countries with the lowest plastic consumption are less industrialized and generate less plastic waste overall, which may contribute to lower contamination levels.</p>
+
+<p><strong>3. Food Packaging</strong><br>
+In lower-income or less industrialized countries (e.g., Chad, Burkina Faso), foods are often sold fresh in markets with minimal plastic packaging, thereby reducing exposure to packaging sources.</p>
+</div>
+""", unsafe_allow_html=True)
+
 insight_section(
-    "Correlation Between Food Groups (Optional/Advanced)",
+    "Country-Specific Microplastic Profiles",
     "🧩",
     "Do certain food categories co-occur in their contamination levels? This analysis explores correlations."
 )
-#placeholder_chart("Correlation heatmap / scatter matrix")
 
-# ---------------------------
-# Closing Callout
-# ---------------------------
 st.markdown("""
-<hr style="margin:40px 0;">
+<div style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+">
+
+<p>Let’s have a look at the differences in top contributors between the countries with the highest and lowest average microplastic consumption (μg/kg), which are <strong>Greece</strong> and <strong>Bangladesh</strong>, respectively.</p>
+
+<p><strong>Greece (highest average consumption):</strong><br>
+- Seven food categories contain more than 100 μg/kg of microplastics.<br>
+- 9 out of Greece’s top 10 contaminated categories are also among the global top 10.<br>
+- Interestingly, refined grains—globally the most contaminated—rank only seventh in Greece.<br>
+- The standout issue is milk, with contamination exceeding 600 μg/kg, making it the most problematic category.</p>
+</div>
+""", unsafe_allow_html=True)
+
+display_chart("output/5_microplastic_breakdown_high_country.png")
+
+st.markdown("""
+<div style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+">
+<p><strong>Bangladesh (lowest average consumption):</strong><br>
+- Refined grains are the most contaminated category (consistent with the global pattern), with levels above 300 μg/kg.<br>
+- Potatoes follow, but their contamination is almost half that of refined grains.</p>
+</div>
+""", unsafe_allow_html=True)
+
+display_chart("output/6_microplastic_breakdown_low_country.png")
+
+insight_section(
+    "Countries with the Fastest Growth in Microplastic Consumption",
+    "📈",
+    "Calculating the Compound Annual Growth Rate, we were able to find out more about the countries with the fastest growth in microplastic consumption."
+)
+
+st.markdown("""
+<table style="
+    font-family: 'Arial', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+">
+    <tr style="background-color:#f2f2f2;">
+        <th style="border: 1px solid #ddd; padding: 8px;">Country</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Starting Year</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">1990 Value (μg/kg)</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">2018 Value (μg/kg)</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Period (Years)</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Growth Rate</th>
+    </tr>
+    <tr><td>Croatia</td><td>2010</td><td>1861.64</td><td>2582.07</td><td>8</td><td>4.17%</td></tr>
+    <tr><td>Laos</td><td>1990</td><td>713.83</td><td>1923.90</td><td>28</td><td>3.60%</td></tr>
+    <tr><td>Belgium</td><td>2010</td><td>1734.37</td><td>2280.74</td><td>8</td><td>3.48%</td></tr>
+    <tr><td>Myanmar</td><td>1990</td><td>493.48</td><td>1232.89</td><td>28</td><td>3.32%</td></tr>
+    <tr><td>Vietnam</td><td>1990</td><td>639.51</td><td>1449.62</td><td>28</td><td>2.97%</td></tr>
+</table>
+""", unsafe_allow_html=True)
+
+st.markdown("""
 <p style="
     font-family: 'Arial', sans-serif; 
     color: #2e3d49; 
     font-size: 17px; 
     line-height: 1.7;
 ">
-Together, these findings provide a comprehensive overview of the presence of 
-<strong>microplastics in our food system</strong>. They highlight urgent challenges 
-and point to areas where further research is needed. One promising avenue for future 
-investigation is the application of <strong>machine learning algorithms 🤖</strong> 
-to forecast trends, which could help predict how microplastic contamination might 
-evolve over time and inform more proactive interventions.
+The table above highlights countries experiencing the fastest growth in microplastic consumption from 1990 to 2018. To understand what drives these trends, we examined the top food contributors in each high-growth country.
+<ul style="
+    margin-left:20px; 
+    font-size: 17px; 
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+    line-height: 1.7;
+">
+    <li>In <strong>Belgium</strong>, <strong>other starchy vegetables</strong> (CAGR 16.95%) and <strong>milk</strong> (CAGR 15.29%) were the largest contributors, with <strong>fruits</strong> also playing a role.</li>
+    <li><strong>Croatia</strong> saw growth mainly in <strong>non-starchy vegetables</strong> (CAGR 18.83%), followed by <strong>processed and unprocessed red meats</strong>.</li>
+    <li><strong>Laos</strong> experienced rises in <strong>added sugars</strong> (CAGR 10.97%) and <strong>non-starchy vegetables</strong> (CAGR 10.12%).</li>
+    <li><strong>Myanmar</strong> growth was led by <strong>processed and red meats</strong> along with <strong>eggs</strong> (all ~9.3%).</li>
+    <li><strong>Vietnam</strong> increases came mainly from <strong>nuts and seeds</strong>, <strong>shellfish</strong>, and <strong>cheese</strong> (CAGR 7–9%).</li>
+</ul>
+This shows that rapid microplastic growth is concentrated in specific high-consumption items rather than evenly across all foods.
+</p>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<table style="
+    font-family: 'Arial', sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+">
+    <tr style="background-color:#f2f2f2;">
+        <th style="border: 1px solid #ddd; padding: 8px;">Country</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Food Category</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Start Year</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">End Year</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Start Value (μg/kg)</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">End Value (μg/kg)</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">Period (Years)</th>
+        <th style="border: 1px solid #ddd; padding: 8px;">CAGR</th>
+    </tr>
+    <tr><td>Belgium</td><td>Other Starchy Vegetables</td><td>2010</td><td>2018</td><td>0.99</td><td>3.45</td><td>8</td><td>16.95%</td></tr>
+    <tr><td>Belgium</td><td>Milk</td><td>2010</td><td>2018</td><td>161.73</td><td>504.71</td><td>8</td><td>15.29%</td></tr>
+    <tr><td>Belgium</td><td>Fruits</td><td>2010</td><td>2018</td><td>155.18</td><td>335.40</td><td>8</td><td>10.11%</td></tr>
+    <tr><td>Croatia</td><td>Non-Starchy Vegetables</td><td>2010</td><td>2018</td><td>210.14</td><td>835.42</td><td>8</td><td>18.83%</td></tr>
+    <tr><td>Croatia</td><td>Processed Meats</td><td>2010</td><td>2018</td><td>54.05</td><td>76.23</td><td>8</td><td>4.39%</td></tr>
+    <tr><td>Croatia</td><td>Unprocessed Red Meats</td><td>2010</td><td>2018</td><td>121.65</td><td>171.55</td><td>8</td><td>4.39%</td></tr>
+    <tr><td>Laos</td><td>Added Sugars</td><td>1990</td><td>2018</td><td>5.97</td><td>110.00</td><td>28</td><td>10.97%</td></tr>
+    <tr><td>Laos</td><td>Non-Starchy Vegetables</td><td>1990</td><td>2018</td><td>42.30</td><td>629.29</td><td>28</td><td>10.12%</td></tr>
+    <tr><td>Laos</td><td>Nuts and Seeds</td><td>1990</td><td>2018</td><td>2.49</td><td>14.77</td><td>28</td><td>6.56%</td></tr>
+    <tr><td>Myanmar</td><td>Processed Meats</td><td>1990</td><td>2018</td><td>3.83</td><td>46.85</td><td>28</td><td>9.36%</td></tr>
+    <tr><td>Myanmar</td><td>Unprocessed Red Meats</td><td>1990</td><td>2018</td><td>10.91</td><td>133.51</td><td>28</td><td>9.36%</td></tr>
+    <tr><td>Myanmar</td><td>Eggs</td><td>1990</td><td>2018</td><td>2.14</td><td>25.89</td><td>28</td><td>9.32%</td></tr>
+    <tr><td>Vietnam</td><td>Nuts and Seeds</td><td>1990</td><td>2018</td><td>2.68</td><td>32.47</td><td>28</td><td>9.31%</td></tr>
+    <tr><td>Vietnam</td><td>Shellfish</td><td>1990</td><td>2018</td><td>3.10</td><td>28.05</td><td>28</td><td>8.19%</td></tr>
+    <tr><td>Vietnam</td><td>Cheese</td><td>1990</td><td>2018</td><td>0.05</td><td>0.38</td><td>28</td><td>7.20%</td></tr>
+</table>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<p style="
+    color: #2e3d49; 
+    font-size: 17px; 
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+">
+Rapid Growth in Microplastic Contamination Across Food Categories  
+Examining the fastest-growing microplastic contributors reveals some interesting patterns. Both Belgium and Croatia show particularly high growth in <strong>vegetables</strong>, with Belgium’s <strong>other starchy vegetables</strong> (CAGR 16.95%) and Croatia’s <strong>non-starchy vegetables</strong> (CAGR 18.83%) leading the way, suggesting that shifts in vegetable consumption or processing practices may strongly influence microplastic exposure in Europe.<br>
+
+Meanwhile, animal-derived products like <strong>milk</strong> in Belgium (CAGR 15.29%) and <strong>processed/unprocessed meats</strong> in Croatia also show noticeable growth, highlighting that both plant and animal food chains are important contributors.<br>
+
+In Asia, Laos exhibits striking increases in <strong>non-starchy vegetables</strong> and <strong>added sugars</strong>, while Myanmar and Vietnam show steady growth across <strong>meats, eggs, nuts, and shellfish</strong>, suggesting a more widespread pattern of contamination across multiple food categories.<br>
+
+Overall, this comparison indicates that European countries tend to have very rapid increases in a few dominant food categories, whereas Asian countries display growth that is spread across several food types. Such patterns hint at the influence of local dietary habits, food production, and packaging practices on microplastic exposure.
+</p>
+""", unsafe_allow_html=True)
+
+insight_section(
+    "Contamination Hotspots: Single Categories or Widespread?",
+    "🌍",
+    "To better understand the sources of microplastic contamination, we examined whether the exposure in each country is dominated by one or a few food categories or more evenly distributed across multiple categories."
+)
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.markdown("""
+    <div style="margin-right: 10px;">
+    <p style="text-align:center; font-size:16px; font-weight:bold;">10 Countries with Most Concentrated Contamination</p>
+    <table style="font-family: Arial, sans-serif; border-collapse: collapse; width: 100%;">
+        <tr style="background-color:#f2f2f2;">
+            <th style="border:1px solid #ddd; padding:8px;">Country</th>
+            <th style="border:1px solid #ddd; padding:8px;">Mean per Category</th>
+            <th style="border:1px solid #ddd; padding:8px;">Std per Category</th>
+            <th style="border:1px solid #ddd; padding:8px;">Max Share</th>
+        </tr>
+        <tr><td>Congo</td><td>77.87</td><td>187.06</td><td>0.579</td></tr>
+        <tr><td>Angola</td><td>73.77</td><td>156.07</td><td>0.516</td></tr>
+        <tr><td>Togo</td><td>59.50</td><td>131.59</td><td>0.508</td></tr>
+        <tr><td>Zimbabwe</td><td>44.61</td><td>89.75</td><td>0.486</td></tr>
+        <tr><td>Madagascar</td><td>57.75</td><td>111.78</td><td>0.461</td></tr>
+        <tr><td>Cote D'Ivoire</td><td>85.96</td><td>189.79</td><td>0.450</td></tr>
+        <tr><td>Tanzania</td><td>72.91</td><td>134.99</td><td>0.445</td></tr>
+        <tr><td>Cambodia</td><td>47.70</td><td>89.21</td><td>0.442</td></tr>
+        <tr><td>Ethiopia</td><td>43.65</td><td>81.71</td><td>0.425</td></tr>
+        <tr><td>Niger</td><td>58.81</td><td>107.94</td><td>0.421</td></tr>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div style="margin-left: 10px;">
+    <p style="text-align:center; font-size:16px; font-weight:bold;">10 Countries with Most Widespread Contamination</p>
+    <table style="font-family: Arial, sans-serif; border-collapse: collapse; width: 100%;">
+        <tr style="background-color:#f2f2f2;">
+            <th style="border:1px solid #ddd; padding:8px;">Country</th>
+            <th style="border:1px solid #ddd; padding:8px;">Mean per Category</th>
+            <th style="border:1px solid #ddd; padding:8px;">Std per Category</th>
+            <th style="border:1px solid #ddd; padding:8px;">Max Share</th>
+        </tr>
+        <tr><td>Spain</td><td>121.87</td><td>138.59</td><td>0.197</td></tr>
+        <tr><td>Slovenia</td><td>108.51</td><td>119.82</td><td>0.196</td></tr>
+        <tr><td>Colombia</td><td>87.90</td><td>98.54</td><td>0.195</td></tr>
+        <tr><td>Cameroon</td><td>97.52</td><td>122.31</td><td>0.194</td></tr>
+        <tr><td>Ukraine</td><td>133.36</td><td>152.04</td><td>0.188</td></tr>
+        <tr><td>Trinidad And Tobago</td><td>72.12</td><td>75.42</td><td>0.184</td></tr>
+        <tr><td>Russia</td><td>120.85</td><td>122.18</td><td>0.178</td></tr>
+        <tr><td>Cuba</td><td>102.70</td><td>114.18</td><td>0.171</td></tr>
+        <tr><td>Belgium</td><td>111.89</td><td>108.68</td><td>0.157</td></tr>
+        <tr><td>Barbados</td><td>139.17</td><td>130.91</td><td>0.147</td></tr>
+    </table>
+    </div>
+    """, unsafe_allow_html=True)
+
+# Continent-level table
+st.markdown('<p style="text-align:center; font-size:16px; font-weight:bold;">Average Share of Most Contaminated Food Category per Continent</p>', unsafe_allow_html=True)
+st.markdown("""
+<table style="font-family: Arial, sans-serif; border-collapse: collapse; width:50%; margin:auto;">
+    <tr style="background-color:#f2f2f2;">
+        <th style="border:1px solid #ddd; padding:8px;">Continent</th>
+        <th style="border:1px solid #ddd; padding:8px;">Max Share</th>
+    </tr>
+    <tr><td>Africa (AF)</td><td>0.339</td></tr>
+    <tr><td>Asia (AS)</td><td>0.287</td></tr>
+    <tr><td>Oceania (OC)</td><td>0.277</td></tr>
+    <tr><td>Europe (EU)</td><td>0.260</td></tr>
+    <tr><td>North America (NA)</td><td>0.245</td></tr>
+    <tr><td>South America (SA)</td><td>0.242</td></tr>
+</table>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-top: 14px;
+    margin-bottom: 20px;
+">
+<strong>Africa Has the Most Concentrated Contamination, Driven by Refined Grains</strong><br>
+It seems that the countries with the most concentrated contamination are mostly African. To investigate this further, we calculated the average share of the most contaminated food category for each continent. Africa ranks highest with an average share of 33.9%, meaning that in African countries (within our dataset), the single most contaminated category accounts for about one-third of total microplastic intake. In comparison, the figure is 28.7% in Asia and 27.7% in Oceania.<br>
+Looking at the top 10 countries with the most concentrated microplastic contamination, we found that in 9 out of 10 of them, the leading category is refined grains. As noted earlier, refined grains are also the largest contributor to microplastics globally. They are the biggest source in 41% of countries in our dataset and are particularly dominant in several African nations. For instance, in Congo, Angola, and Togo, refined grains account for more than 50% of total contamination (μg/kg). This contamination often originates during milling, drying, and packaging processes.<br>
+Finally, we checked which category is the biggest contributor across all countries. On average, refined grains top the list in 44 countries, followed by milk (32 countries) and non-starchy vegetables (16 countries).
+</p>
+""", unsafe_allow_html=True)
+
+display_chart("output/8_biggest_contributors_count.png")
+
+st.subheader("➡️ Do Microplastic Levels Co-Occur Across Food Groups?")
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-top: 14px;
+    margin-bottom: 20px;
+">
+Are countries with high contamination in one food category, such as fish, also seeing high contamination in related categories like seafood or processed foods? Let's have a look at potential correlations using correlation matrices and scatter plots.
+</p>
+""", unsafe_allow_html=True)
+
+display_chart("output/7_intermediate_correlation_of_microplastics.png")
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+">
+<strong>Milk is a Strong Predictor of Totals</strong><br>
+To complement the main results, we also examined how individual food groups correlate with the overall level of microplastic contamination. This perspective highlights which categories tend to move in step with total contamination and therefore act as key drivers of variation across countries and years.<br>
+The strongest correlations were found for milk, unprocessed red meats, and potatoes (correlations above 0.65).<br>
+Milk stands out in particular: it is not only among the most contaminated categories on average, but also highly predictive of total contamination levels. Non-starchy vegetables show a similar, though slightly weaker, pattern. By contrast, refined grains, despite their high average contamination, show little correlation with totals, suggesting they are consistently contaminated across countries rather than driving cross-country differences.<br>
+Taken together, this indicates that some foods (such as milk and non-starchy vegetables) are both highly contaminated and central to overall exposure patterns, while others (like red meats and potatoes) function more as “swing factors”: they may not always be the most contaminated foods, but where they are elevated, they strongly boost the overall contamination totals.
+</p>
+""", unsafe_allow_html=True)
+
+# ---------------------------
+# Closing Callout
+# ---------------------------
+insight_section(
+    "Outlook and Possible Developments",
+    "🧩",
+    "Here some potential directions for future research."
+)
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+    font-size: 17px; 
+    line-height: 1.7;
+">
+Together, these findings provide a comprehensive overview of 
+<strong>microplastics in our food system</strong>, highlighting urgent challenges 
+and pointing to areas for further research. One promising avenue is the use of 
+<strong>machine learning algorithms 🤖</strong> to forecast contamination trends, 
+which could help predict how microplastic levels might evolve over time and inform 
+more proactive interventions.
 </p>
 """, unsafe_allow_html=True)
