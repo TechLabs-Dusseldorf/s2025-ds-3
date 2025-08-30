@@ -77,7 +77,7 @@ insight_section(
     "We wanted to understand the big picture: what does global microplastic exposure look like over time?"
 )
 
-st.subheader("➡️ Overall average consumption across all countries and years")
+st.subheader("➡️ Rising Trend of Global Food Microplastic Intake")
 
 st.markdown("""
 <p style="
@@ -87,7 +87,7 @@ st.markdown("""
     line-height: 1.7;
     margin-bottom: 26px;
 ">
-As a general trend, microplastic contamination in our food is visibly rising, the overall average consumption across all countries and years being <strong>1600.6 µg/kg</strong>.
+Microplastic contamination in our food is visibly rising, the overall average consumption across all countries and years being <strong>1600.6 µg/kg</strong>.
 </p>
 """, unsafe_allow_html=True)
 
@@ -102,9 +102,24 @@ insight_section(
     "Which foods contribute the most to microplastic intake?"
 )
 
-st.subheader("➡️ Top 3 food categories by microplastic content")
+st.subheader("➡️ Refined Grains, Milk, and Vegetables Dominate Global Microplastic Intake")
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+    font-size: 17px; 
+    line-height: 1.7;
+    margin-bottom: 26px;
+">
+Across all countries and years, these three categories show the highest average contamination levels (μg/kg)</strong>.
+</p>
+""", unsafe_allow_html=True)
+
 display_chart("output/2_average_consumption_top_n_food_categories.png")
 
+st.subheader("➡️ How the Top Three Categories Have Evolved")
+
 st.markdown("""
 <p style="
     font-family: 'Arial', sans-serif; 
@@ -113,8 +128,7 @@ st.markdown("""
     line-height: 1.7;
     margin-bottom: 26px;
 ">
-Here, we took a closer look at the three categories with the highest microplastic concentrations.  
-Their trends over time are summarized below:
+The three biggest contributors tell three very different stories of risk.
 </p>
 
 <ul style="
@@ -124,27 +138,27 @@ Their trends over time are summarized below:
     line-height: 1.7;
     margin-bottom: 26px;
 ">
-  <li><strong>Refined grains</strong> (220.60 µg/kg per year): Steady from 1990 to 2005, followed by a significant upward jump.</li>
-  <li><strong>Milk</strong> (-17.32 µg/kg per year): Slowly rising until 2005, then a sharp drop. Recovery starts after 2010, but levels in 2018 remain lower than before the 2005 drop (hence the negative growth rate).</li>
-  <li><strong>Non-starchy vegetables</strong> (351.41 µg/kg per year): Continuous fast growth across the whole period, showing no signs of improvement. This is the fastest-increasing category among the three.</li>
+  <li><strong>Refined grains</strong> looked stable at first, but after 2005 contamination spiked and has stayed dangerously high ever since.</li>
+  <li><strong>Milk</strong> rose for years, then dropped sharply around 2005. Even with a partial rebound, today’s levels remain lower than before, making milk the only one moving in a less alarming direction.</li>
+  <li><strong>Non-starchy vegetables</strong> are the most concerning: contamination has climbed relentlessly across the whole period, with no sign of slowing down.</li>
 </ul>
 """, unsafe_allow_html=True)
 
-st.subheader("➡️ Growth speed for top 3 food categories")
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+    font-size: 17px; 
+    line-height: 1.7;
+    margin-bottom: 26px;
+">
+Overall, non-starchy vegetables exhibit the fastest increase in microplastic content (351.41 µg/kg per year), followed by refined grains (220.60 µg/kg per year). Milk, in contrast, is decreasing slightly (-17.32 µg/kg per year).
+</p>
+""", unsafe_allow_html=True)
+
 display_chart("output/4_analyze_microplastic_trends.png")
-st.markdown("""
-<p style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-    margin-bottom: 26px;
-">
-Non-starchy vegetables exhibit the fastest increase in microplastic content (351.41 µg/kg per year), followed by refined grains (220.60 µg/kg per year). Milk, in contrast, is decreasing slightly (-17.32 µg/kg per year).
-</p>
-""", unsafe_allow_html=True)
 
-st.subheader("➡️ Changes in contribution of food categories (1990 vs 2018)")
+st.subheader("➡️ The Usual Suspects Haven’t Changed")
 
 st.markdown("""
 <p style="
@@ -153,89 +167,24 @@ st.markdown("""
     font-size: 17px; 
     line-height: 1.7;
 ">
-Below, we compare how different food categories contributed to total microplastic intake in 1990 and 2018.
-The percentages indicate each category's share of total μg/kg consumption.
-</p>
-""", unsafe_allow_html=True)
-
-col1, col2 = st.columns(2)
-with col1:
-    st.markdown("**1990 Contribution (%)**")
-    st.table({
-        "Food Category": ["cheese","yoghurt","total_milk","fruits","refined_grains",
-                          "whole_grains","nuts_and_seeds","total_processed_meats",
-                          "unprocessed_red_meats","fish","shellfish","eggs",
-                          "total_salt","added_sugars","non-starchy_vegetables",
-                          "potatoes","other_starchy_vegetables","beans_and_legumes"],
-        "Percentage": ["0.38%","3.55%","17.18%","12.47%","20.36%",
-                       "4.89%","0.70%","2.65%","5.43%","2.38%","0.46%",
-                       "0.99%","0.45%","5.03%","12.96%","4.89%","4.06%","1.19%"]
-    })
-
-with col2:
-    st.markdown("**2018 Contribution (%)**")
-    st.table({
-        "Food Category": ["cheese","yoghurt","total_milk","fruits","refined_grains",
-                          "whole_grains","nuts_and_seeds","total_processed_meats",
-                          "unprocessed_red_meats","fish","shellfish","eggs",
-                          "total_salt","added_sugars","non-starchy_vegetables",
-                          "potatoes","other_starchy_vegetables","beans_and_legumes"],
-        "Percentage": ["0.42%","3.32%","14.25%","12.41%","19.03%",
-                       "4.67%","0.82%","2.74%","5.88%","2.60%","0.47%",
-                       "1.23%","0.41%","6.02%","15.58%","4.97%","3.97%","1.19%"]
-    })
-
-st.markdown("""
-<p style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-">
-Some notable shifts between 1990 and 2018:
-
+When we compare how different food categories contributed to total microplastic intake in 1990 and 2018, at first glance, there seems to be a shift in the story. Two of the three categories with the highest average contamination (refined grains and milk) have actually lost share since 1990.
 <ul style="margin-left:20px;">
-    <li><strong>Eggs</strong> increased substantially (+24.6%), becoming a more prominent source of microplastics.</li>
-    <li><strong>Non-starchy vegetables</strong> also grew (+20.2%), reflecting the rising exposure from plant-based foods.</li>
-    <li><strong>Added sugars</strong> and <strong>nuts & seeds</strong> showed moderate increases (+19.8% and +17.9%, respectively).</li>
-    <li>In contrast, <strong>milk</strong> (-17.1%), <strong>total salt</strong> (-8.7%), and <strong>refined grains</strong> (-6.5%) decreased in relative contribution over the period.</li>
+    <li><strong>Milk</strong> fell from 17.18% to 13.24%, the steepest drop of any category (−17.1%).</li>
+    <li><strong>Refined grains</strong> slipped from 20.36% to 19.03% (−6.5%).</li>
 </ul>
-
-These shifts highlight that while some traditional staples contribute less, newer or processed food categories are becoming more significant sources of microplastics.
 </p>
 """, unsafe_allow_html=True)
-
-st.subheader("➡️ Changes in Main Contributing Categories Over Time")
-display_chart("output/9_food_category_shares_over_time.png")
 
 st.markdown("""
 <p style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
     line-height: 1.7;
-    margin-bottom: 26px;
 ">
-Have the main contributing food categories changed over time, and could other foods pose greater risks in the future?
+This decline might suggest that other foods are catching up and could become bigger threats in the future. But when we dig deeper, the picture turns out to be different. Rankings across food categories have barely changed in these years.
 </p>
-
-<ul style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-    margin-bottom: 26px;
-">
-    <li><strong>Refined grains</strong> and <strong>milk</strong> remain the top contributors but have lost relative share since 1990.</li>
-    <li><strong>Milk</strong> dropped from <strong>17.18%</strong> (1990) to <strong>13.24%</strong> (2018), a decline of <strong>-17.10%</strong>, the largest drop among all categories.</li>
-    <li><strong>Refined grains</strong> fell from <strong>20.36%</strong> to <strong>19.03%</strong> (a -6.53% decline).</li>
-    <li>Other categories, whose absolute contributions are still lower, are gaining a larger share, but the shifts are relatively minor.</li>
-    <li>Analyzing rank shifts reveals that the relative contributions of most food categories have remained largely unchanged between 1990 and 2018.</li>
-    <li>This stability suggests that contamination patterns are structurally persistent, and interventions so far have not significantly changed which foods dominate contamination risks.</li>
-</ul>
-""", unsafe_allow_html=True)
-
-st.markdown("""
+            
 <p style="
     font-family: 'Arial', sans-serif;
     color: #2e3d49;
@@ -281,15 +230,19 @@ Columns show the percentage share in each year, the rank in both years, the rank
     <tr><td>total_milk</td><td>17.18%</td><td>14.25%</td><td>2</td><td>3</td><td>-1</td><td>0.10</td></tr>
 </table>
 
+
 <p style="
     font-family: 'Arial', sans-serif;
     color: #2e3d49;
     font-size: 17px;
     line-height: 1.7;
-">
-This table highlights the few categories that have moved up in rank (eggs, non-starchy vegetables, added sugars, cheese, potatoes), while others like milk and refined grains lost relative share. Overall, the system is largely stable, showing that contamination patterns are persistent over time.
+">         
+In other words, while shares have shifted slightly, the hierarchy of contamination is remarkably stable and persistent. The same foods that dominated three decades ago still dominate today. This stability suggests that contamination patterns are structurally persistent, and interventions so far have not significantly changed which foods dominate contamination risks.
+
 </p>
 """, unsafe_allow_html=True)
+
+display_chart("output/9_food_category_shares_over_time.png")
 
 # ---------------------------
 # Section 4: Geographic Variations
