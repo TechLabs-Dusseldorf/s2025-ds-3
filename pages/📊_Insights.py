@@ -234,7 +234,7 @@ Columns show the percentage share in each year, the rank in both years, the rank
     font-size: 17px;
     line-height: 1.7;
 ">         
-In other words, while shares have shifted slightly, the hierarchy of contamination is remarkably stable and persistent. The same foods that dominated three decades ago still dominate today. This stability suggests that contamination patterns are structurally persistent, and interventions so far have not significantly changed which foods dominate contamination risks.
+In other words, while shares have shifted slightly, the hierarchy of contamination is remarkably stable and persistent. The same foods that dominated three decades ago still dominate today. <strong>This stability suggests that contamination patterns are structurally persistent, and interventions so far have not significantly changed which foods dominate contamination risks</strong>.
 
 </p>
 """, unsafe_allow_html=True)
@@ -357,12 +357,12 @@ st.markdown("""
 <p>When comparing countries with the highest and lowest average microplastic contamination, certain patterns emerge that may point to underlying causes.</p>
 
 <p><strong>1. Marine Geography</strong><br>
-Many of the highest-consuming countries are located around semi-enclosed or enclosed seas such as the Mediterranean, Black Sea, and Caribbean. These waters have limited circulation, which may allow plastics to accumulate more than in open oceans.<br>
-In contrast, several of the lowest-consuming countries are either landlocked (e.g., Chad, Burkina Faso, Ethiopia) or situated on coastlines linked to more open seas (e.g., Bay of Bengal, Gulf of Thailand), where pollutants may disperse more widely.</p>
+Many of the highest-consuming countries are located around <strong>semi-enclosed or enclosed seas</strong> such as the Mediterranean, Black Sea, and Caribbean. These waters have limited circulation, which may allow plastics to accumulate more than in open oceans.<br>
+In contrast, several of the lowest-consuming countries are either <strong>landlocked</strong> (e.g., Chad, Burkina Faso, Ethiopia) or situated on coastlines linked to <strong>more open seas</strong> (e.g., Bay of Bengal, Gulf of Thailand), where pollutants may disperse more widely.</p>
 
 <p><strong>2. Industrialization and Trade</strong><br>
 Industrial and highly connected economies (e.g., the Netherlands, the United States, and Turkey) appear among the high-consumption group. This could reflect greater levels of plastic production, waste generation, and shipping activity, which are known sources of microplastics.<br>
-Many of the countries with the lowest plastic consumption are less industrialized and generate less plastic waste overall, which may contribute to lower contamination levels.</p>
+Many of the countries with the lowest plastic consumption are <strong>less industrialized</strong> and generate less plastic waste overall, which may contribute to lower contamination levels.</p>
 
 <p><strong>3. Food Packaging</strong><br>
 In lower-income or less industrialized countries (e.g., Chad, Burkina Faso), foods are often sold fresh in markets with minimal plastic packaging, thereby reducing exposure to packaging sources.</p>
@@ -520,9 +520,9 @@ Overall, this comparison indicates that European countries tend to have very rap
 """, unsafe_allow_html=True)
 
 insight_section(
-    "Contamination Hotspots: Single Categories or Widespread?",
+    "Africa Has the Most Concentrated Contamination, Driven by Refined Grains",
     "🌍",
-    "To better understand the sources of microplastic contamination, we examined whether the exposure in each country is dominated by one or a few food categories or more evenly distributed across multiple categories."
+    "To better understand the sources of microplastic contamination, we examined whether the exposure in each country is dominated by one or a few food categories or more evenly distributed across multiple categories. For this purpose, we what fraction of calculated how much of the total contamination comes from the single largest food category (Max Share)."
 )
 
 col1, col2 = st.columns(2)
@@ -577,6 +577,20 @@ with col2:
     </div>
     """, unsafe_allow_html=True)
 
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-top: 14px;
+    margin-bottom: 20px;
+">
+It seems that the countries with the most concentrated contamination are mostly African. To investigate this further, we calculated Max Share for each continent. Africa ranks highest with an average share of <strong>33.9%</strong>, meaning that in African countries (within our dataset), the single most contaminated category accounts for about one-third of total microplastic intake. In comparison, the figure is <strong>28.7% in Asia and 27.7% in Oceania</strong>.<br>
+</p>
+""", unsafe_allow_html=True)
+
 # Continent-level table
 st.markdown('<p style="text-align:center; font-size:16px; font-weight:bold;">Average Share of Most Contaminated Food Category per Continent</p>', unsafe_allow_html=True)
 st.markdown("""
@@ -603,16 +617,15 @@ st.markdown("""
     margin-top: 14px;
     margin-bottom: 20px;
 ">
-<strong>Africa Has the Most Concentrated Contamination, Driven by Refined Grains</strong><br>
-It seems that the countries with the most concentrated contamination are mostly African. To investigate this further, we calculated the average share of the most contaminated food category for each continent. Africa ranks highest with an average share of 33.9%, meaning that in African countries (within our dataset), the single most contaminated category accounts for about one-third of total microplastic intake. In comparison, the figure is 28.7% in Asia and 27.7% in Oceania.<br>
-Looking at the top 10 countries with the most concentrated microplastic contamination, we found that in 9 out of 10 of them, the leading category is refined grains. As noted earlier, refined grains are also the largest contributor to microplastics globally. They are the biggest source in 41% of countries in our dataset and are particularly dominant in several African nations. For instance, in Congo, Angola, and Togo, refined grains account for more than 50% of total contamination (μg/kg). This contamination often originates during milling, drying, and packaging processes.<br>
-Finally, we checked which category is the biggest contributor across all countries. On average, refined grains top the list in 44 countries, followed by milk (32 countries) and non-starchy vegetables (16 countries).
+Looking at the top 10 countries with the most concentrated microplastic contamination, we found that in 9 out of 10 of them, the leading category is <strong>refined grains</strong>. As noted earlier, refined grains are also the largest contributor to microplastics globally. They are the biggest source in <strong>41% of countries</strong> in our dataset and are particularly dominant in several African nations. For instance, in <strong>Congo, Angola, and Togo</strong>, refined grains account for <strong>more than 50%</strong> of total contamination (μg/kg). This contamination often originates during <strong>milling, drying, and packaging processes</strong>.<br>
+Finally, we checked which category is the biggest contributor across all countries. On average, <strong>refined grains top the list in 44 countries</strong>, followed by <strong>milk (32 countries)</strong> and <strong>non-starchy vegetables (16 countries)</strong>.
 </p>
 """, unsafe_allow_html=True)
 
 display_chart("output/8_biggest_contributors_count.png")
 
-st.subheader("➡️ Do Microplastic Levels Co-Occur Across Food Groups?")
+st.subheader("➡️ Milk is a Strong Predictor of Totals")
+
 
 st.markdown("""
 <p style="
@@ -620,11 +633,10 @@ st.markdown("""
     color: #2e3d49;
     font-size: 17px;
     line-height: 1.7;
-    margin-top: 14px;
     margin-bottom: 20px;
 ">
-Are countries with high contamination in one food category, such as fish, also seeing high contamination in related categories like seafood or processed foods? Let's have a look at potential correlations using correlation matrices and scatter plots.
-</p>
+To complement the main results, we also examined how individual food groups correlate with the overall level of microplastic contamination. This perspective highlights which categories tend to move in step with total contamination and therefore act as key drivers of variation across countries and years. The strongest correlations were found for <strong>milk, unprocessed red meats, and potatoes (correlations above 0.65)</strong>.
+</p>      
 """, unsafe_allow_html=True)
 
 display_chart("output/7_intermediate_correlation_of_microplastics.png")
@@ -637,13 +649,20 @@ st.markdown("""
     line-height: 1.7;
     margin-bottom: 20px;
 ">
-<strong>Milk is a Strong Predictor of Totals</strong><br>
-To complement the main results, we also examined how individual food groups correlate with the overall level of microplastic contamination. This perspective highlights which categories tend to move in step with total contamination and therefore act as key drivers of variation across countries and years.<br>
-The strongest correlations were found for milk, unprocessed red meats, and potatoes (correlations above 0.65).<br>
-Milk stands out in particular: it is not only among the most contaminated categories on average, but also highly predictive of total contamination levels. Non-starchy vegetables show a similar, though slightly weaker, pattern. By contrast, refined grains, despite their high average contamination, show little correlation with totals, suggesting they are consistently contaminated across countries rather than driving cross-country differences.<br>
-Taken together, this indicates that some foods (such as milk and non-starchy vegetables) are both highly contaminated and central to overall exposure patterns, while others (like red meats and potatoes) function more as “swing factors”: they may not always be the most contaminated foods, but where they are elevated, they strongly boost the overall contamination totals.
+<strong>Milk</strong> stands out in particular: it is not only among the most contaminated categories on average, but also highly predictive of total contamination levels. <strong>Non-starchy vegetables</strong> show a similar, though slightly weaker, pattern. By contrast, <strong>refined grains</strong>, despite their high average contamination, show little correlation with totals, suggesting they are consistently contaminated across countries rather than driving cross-country differences.
+</p>      
+               
+<p style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+">
+Taken together, this indicates that some foods (such as milk and non-starchy vegetables) are both highly contaminated and central to overall exposure patterns, while others (like red meats and potatoes) function more as <strong>“swing factors”</strong>: they may not always be the most contaminated foods, but where they are elevated, they strongly boost the overall contamination totals.
 </p>
 """, unsafe_allow_html=True)
+
 
 # ---------------------------
 # Closing Callout
