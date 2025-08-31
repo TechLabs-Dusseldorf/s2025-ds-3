@@ -355,11 +355,11 @@ st.markdown("---")
 st.markdown("## Geographical Patterns and Possible Explanations")
 st.markdown("""
 <div style="
-    font-family: 'Arial', sans-serif !important;
-    color: #2e3d49 !important;
-    font-size: 17px !important;
-    line-height: 1.7 !important;
-    margin-bottom: 20px !important;
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
 ">
 <p>When comparing countries with the highest and lowest average microplastic contamination, certain patterns emerge that may point to underlying causes.</p>
 
@@ -376,11 +376,8 @@ In lower-income or less industrialized countries (e.g., Chad, Burkina Faso), foo
 </div>
 """, unsafe_allow_html=True)
 
-insight_section(
-    "Country-Specific Microplastic Profiles",
-    "🧩",
-    "Do certain food categories co-occur in their contamination levels? This analysis explores correlations."
-)
+
+st.subheader("➡️ Different Countries, Different Main Threats")
 
 st.markdown("""
 <div style="
@@ -391,13 +388,9 @@ st.markdown("""
     margin-bottom: 20px;
 ">
 
-<p>Let’s have a look at the differences in top contributors between the countries with the highest and lowest average microplastic consumption (μg/kg), which are <strong>Greece</strong> and <strong>Bangladesh</strong>, respectively.</p>
+<p>When we look at the countries with the highest and lowest average microplastic consumption, two very different stories appear.</p>
 
-<p><strong>Greece (highest average consumption):</strong><br>
-- Seven food categories contain more than 100 μg/kg of microplastics.<br>
-- 9 out of Greece’s top 10 contaminated categories are also among the global top 10.<br>
-- Interestingly, refined grains—globally the most contaminated—rank only seventh in Greece.<br>
-- The standout issue is milk, with contamination exceeding 600 μg/kg, making it the most problematic category.</p>
+<p>In <strong>Greece</strong>, which sits at the top of the ranking, contamination is spread across many foods. Seven categories show levels above 100 μg/kg, and 9 out of the top 10 overlap with the global picture. But the real surprise is milk: with more than 600 μg/kg, it overshadows every other category and becomes Greece’s biggest threat. Even refined grains, usually the global leader, only come in seventh here.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -411,19 +404,25 @@ st.markdown("""
     line-height: 1.7;
     margin-bottom: 20px;
 ">
-<p><strong>Bangladesh (lowest average consumption):</strong><br>
-- Refined grains are the most contaminated category (consistent with the global pattern), with levels above 300 μg/kg.<br>
-- Potatoes follow, but their contamination is almost half that of refined grains.</p>
+<p>At the other end of the spectrum lies <strong>Bangladesh</strong>, the country with the lowest average consumption. Here, the picture looks simpler. Refined grains dominate the contamination profile with values above 300 μg/kg, while the next category, potatoes, lags far behind at almost half that level.</p>
 </div>
 """, unsafe_allow_html=True)
 
 display_chart("output/6_microplastic_breakdown_low_country.png")
 
-insight_section(
-    "Countries with the Fastest Growth in Microplastic Consumption",
-    "📈",
-    "Calculating the Compound Annual Growth Rate, we were able to find out more about the countries with the fastest growth in microplastic consumption."
-)
+st.subheader("➡️ Countries with the Fastest Growth")
+
+st.markdown("""
+<div style="
+    font-family: 'Arial', sans-serif;
+    color: #2e3d49;
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 20px;
+">
+<p>When looking at which countries have seen the fastest rise in microplastic contamination, a mix of European and Asian nations stand out. <strong>Belgium, Croatia, Laos, Myanmar, and Vietnam</strong> all show strong growth over time. </p>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <table style="
@@ -470,20 +469,7 @@ st.markdown("""
 </style>
 
 <p class="custom-text">
-The table above highlights countries experiencing the fastest growth in microplastic consumption from 1990 to 2018. To understand what drives these trends, we examined the top food contributors in each high-growth country.
-</p>
-
-<ul class="custom-list">
-    <li>In <strong>Belgium</strong>, <strong>other starchy vegetables</strong> (CAGR 16.95%) and <strong>milk</strong> (CAGR 15.29%) were the largest contributors, with <strong>fruits</strong> also playing a role.</li>
-    <li><strong>Croatia</strong> saw growth mainly in <strong>non-starchy vegetables</strong> (CAGR 18.83%), followed by <strong>processed and unprocessed red meats</strong>.</li>
-    <li><strong>Laos</strong> experienced rises in <strong>added sugars</strong> (CAGR 10.97%) and <strong>non-starchy vegetables</strong> (CAGR 10.12%).</li>
-    <li><strong>Myanmar</strong> growth was led by <strong>processed and red meats</strong> along with <strong>eggs</strong> (all ~9.3%).</li>
-    <li><strong>Vietnam</strong> increases came mainly from <strong>nuts and seeds</strong>, <strong>shellfish</strong>, and <strong>cheese</strong> (CAGR 7–9%).</li>
-</ul>
-
-<p class="custom-text">
-This shows that rapid microplastic growth is concentrated in specific high-consumption items rather than evenly across all foods.
-</p>
+<strong>Croatia and Belgium</strong> show very steep rises despite having <strong>shorter time periods (since 2010)</strong>, while Laos, Myanmar, and Vietnam have steadier but long-term growth across nearly three decades.</p>
 """, unsafe_allow_html=True)
 
 st.markdown("""
@@ -533,7 +519,7 @@ st.markdown("""
 </style>
 
 <p class="custom-text">
-<b>Rapid Growth in Microplastic Contamination Across Food Categories</b>
+<b>Food Categories Driving the Growth</b>
 </p>
 
 <p class="custom-text">
@@ -548,16 +534,21 @@ Meanwhile, animal-derived products like <strong>milk</strong> in Belgium (CAGR 1
 In Asia, Laos exhibits striking increases in <strong>non-starchy vegetables</strong> and <strong>added sugars</strong>, while Myanmar and Vietnam show steady growth across <strong>meats, eggs, nuts, and shellfish</strong>, suggesting a more widespread pattern of contamination across multiple food categories.
 </p>
 
-<p class="custom-text">
-Overall, this comparison indicates that European countries tend to have very rapid increases in a few dominant food categories, whereas Asian countries display growth that is spread across several food types. Such patterns hint at the influence of local dietary habits, food production, and packaging practices on microplastic exposure.
-</p>
 """, unsafe_allow_html=True)
 
-insight_section(
-    "Africa Has the Most Concentrated Contamination, Driven by Refined Grains",
-    "🌍",
-    "To better understand the sources of microplastic contamination, we examined whether the exposure in each country is dominated by one or a few food categories or more evenly distributed across multiple categories. For this purpose, we what fraction of calculated how much of the total contamination comes from the single largest food category (Max Share)."
-)
+st.subheader("➡️ Africa Has the Most Concentrated Contamination, Driven by Refined Grains")
+
+st.markdown("""
+<p style="
+    font-family: 'Arial', sans-serif; 
+    color: #2e3d49; 
+    font-size: 17px; 
+    line-height: 1.7;
+    margin-bottom: 26px;
+">
+To better understand the sources of microplastic contamination, we examined whether the exposure in each country is dominated by one or a few food categories or more evenly distributed across multiple categories. For this purpose, we calculated what fraction of the total contamination comes from the single largest food category (Max Share).</b>
+</p>
+""", unsafe_allow_html=True)
 
 col1, col2 = st.columns(2)
 
@@ -621,7 +612,7 @@ st.markdown("""
     margin-top: 14px;
     margin-bottom: 20px;
 ">
-It seems that the countries with the most concentrated contamination are mostly African. To investigate this further, we calculated Max Share for each continent. Africa ranks highest with an average share of <strong>33.9%</strong>, meaning that in African countries (within our dataset), the single most contaminated category accounts for about one-third of total microplastic intake. In comparison, the figure is <strong>28.7% in Asia and 27.7% in Oceania</strong>.<br>
+It seems that the countries with the most concentrated contamination are mostly <strong>African</strong>. To investigate this further, we calculated Max Share for each continent. Africa ranks highest with an average share of <strong>33.9%</strong>, meaning that in African countries (within our dataset), the single most contaminated category accounts for about one-third of total microplastic intake. In comparison, the figure is <strong>28.7% in Asia and 27.7% in Oceania</strong>.<br>
 </p>
 """, unsafe_allow_html=True)
 
