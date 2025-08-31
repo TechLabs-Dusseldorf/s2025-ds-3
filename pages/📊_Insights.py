@@ -113,23 +113,21 @@ display_chart("output/2_average_consumption_top_n_food_categories.png")
 st.subheader("➡️ How the Top Three Categories Have Evolved")
 
 st.markdown("""
-<p style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-    margin-bottom: 26px;
-">
+<style>
+.custom-text {
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 26px !important;
+}
+</style>
+
+<p class="custom-text">
 The three biggest contributors tell three very different stories of risk.
 </p>
 
-<ul style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-    margin-bottom: 26px;
-">
+<ul class="custom-text">
   <li><strong>Refined grains</strong> looked stable at first, but after 2005 contamination spiked and has stayed dangerously high ever since.</li>
   <li><strong>Milk</strong> rose for years, then dropped sharply around 2005. Even with a partial rebound, today’s levels remain lower than before, making milk the only one moving in a less alarming direction.</li>
   <li><strong>Non-starchy vegetables</strong> are the most concerning: contamination has climbed relentlessly across the whole period, with no sign of slowing down.</li>
@@ -153,20 +151,29 @@ display_chart("output/4_analyze_microplastic_trends.png")
 st.subheader("➡️ The Usual Suspects Haven’t Changed")
 
 st.markdown("""
-<p style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-">
+<style>
+.custom-text {
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 20px !important;
+}
+.custom-list {
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-left: 20px !important;
+    margin-bottom: 20px !important;
+}
+</style>
+
+<p class="custom-text">
 When we compare how different food categories contributed to total microplastic intake in 1990 and 2018, at first glance, there seems to be a shift in the story. Two of the three categories with the highest average contamination (refined grains and milk) have actually lost share since 1990.
-<ul style="
-    margin-left:20px; 
-    font-size: 17px; 
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    line-height: 1.7;
-">
+</p>
+
+<ul class="custom-list">
     <li><strong>Milk</strong> fell from 17.18% to 13.24%, the steepest drop of any category (−17.1%).</li>
     <li><strong>Refined grains</strong> slipped from 20.36% to 19.03% (−6.5%).</li>
 </ul>
@@ -348,11 +355,11 @@ st.markdown("---")
 st.markdown("## Geographical Patterns and Possible Explanations")
 st.markdown("""
 <div style="
-    font-family: 'Arial', sans-serif;
-    color: #2e3d49;
-    font-size: 17px;
-    line-height: 1.7;
-    margin-bottom: 20px;
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 20px !important;
 ">
 <p>When comparing countries with the highest and lowest average microplastic contamination, certain patterns emerge that may point to underlying causes.</p>
 
@@ -441,27 +448,40 @@ st.markdown("""
 </table>
 """, unsafe_allow_html=True)
 
+import streamlit as st
+
 st.markdown("""
-<p style="
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    font-size: 17px; 
-    line-height: 1.7;
-">
+<style>
+.custom-text {
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 20px !important;
+}
+.custom-list {
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-left: 20px !important;
+    margin-bottom: 20px !important;
+}
+</style>
+
+<p class="custom-text">
 The table above highlights countries experiencing the fastest growth in microplastic consumption from 1990 to 2018. To understand what drives these trends, we examined the top food contributors in each high-growth country.
-<ul style="
-    margin-left:20px; 
-    font-size: 17px; 
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-    line-height: 1.7;
-">
+</p>
+
+<ul class="custom-list">
     <li>In <strong>Belgium</strong>, <strong>other starchy vegetables</strong> (CAGR 16.95%) and <strong>milk</strong> (CAGR 15.29%) were the largest contributors, with <strong>fruits</strong> also playing a role.</li>
     <li><strong>Croatia</strong> saw growth mainly in <strong>non-starchy vegetables</strong> (CAGR 18.83%), followed by <strong>processed and unprocessed red meats</strong>.</li>
     <li><strong>Laos</strong> experienced rises in <strong>added sugars</strong> (CAGR 10.97%) and <strong>non-starchy vegetables</strong> (CAGR 10.12%).</li>
     <li><strong>Myanmar</strong> growth was led by <strong>processed and red meats</strong> along with <strong>eggs</strong> (all ~9.3%).</li>
     <li><strong>Vietnam</strong> increases came mainly from <strong>nuts and seeds</strong>, <strong>shellfish</strong>, and <strong>cheese</strong> (CAGR 7–9%).</li>
 </ul>
+
+<p class="custom-text">
 This shows that rapid microplastic growth is concentrated in specific high-consumption items rather than evenly across all foods.
 </p>
 """, unsafe_allow_html=True)
@@ -502,19 +522,33 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.markdown("""
-<p style="
-    color: #2e3d49; 
-    font-size: 17px; 
-    font-family: 'Arial', sans-serif; 
-    color: #2e3d49; 
-">
-Rapid Growth in Microplastic Contamination Across Food Categories  
-Examining the fastest-growing microplastic contributors reveals some interesting patterns. Both Belgium and Croatia show particularly high growth in <strong>vegetables</strong>, with Belgium’s <strong>other starchy vegetables</strong> (CAGR 16.95%) and Croatia’s <strong>non-starchy vegetables</strong> (CAGR 18.83%) leading the way, suggesting that shifts in vegetable consumption or processing practices may strongly influence microplastic exposure in Europe.<br>
+<style>
+.custom-text {
+    font-family: 'Arial', sans-serif !important;
+    color: #2e3d49 !important;
+    font-size: 17px !important;
+    line-height: 1.7 !important;
+    margin-bottom: 20px !important;
+}
+</style>
 
-Meanwhile, animal-derived products like <strong>milk</strong> in Belgium (CAGR 15.29%) and <strong>processed/unprocessed meats</strong> in Croatia also show noticeable growth, highlighting that both plant and animal food chains are important contributors.<br>
+<p class="custom-text">
+<b>Rapid Growth in Microplastic Contamination Across Food Categories</b>
+</p>
 
-In Asia, Laos exhibits striking increases in <strong>non-starchy vegetables</strong> and <strong>added sugars</strong>, while Myanmar and Vietnam show steady growth across <strong>meats, eggs, nuts, and shellfish</strong>, suggesting a more widespread pattern of contamination across multiple food categories.<br>
+<p class="custom-text">
+Examining the fastest-growing microplastic contributors reveals some interesting patterns. Both Belgium and Croatia show particularly high growth in <strong>vegetables</strong>, with Belgium’s <strong>other starchy vegetables</strong> (CAGR 16.95%) and Croatia’s <strong>non-starchy vegetables</strong> (CAGR 18.83%) leading the way, suggesting that shifts in vegetable consumption or processing practices may strongly influence microplastic exposure in Europe.
+</p>
 
+<p class="custom-text">
+Meanwhile, animal-derived products like <strong>milk</strong> in Belgium (CAGR 15.29%) and <strong>processed/unprocessed meats</strong> in Croatia also show noticeable growth, highlighting that both plant and animal food chains are important contributors.
+</p>
+
+<p class="custom-text">
+In Asia, Laos exhibits striking increases in <strong>non-starchy vegetables</strong> and <strong>added sugars</strong>, while Myanmar and Vietnam show steady growth across <strong>meats, eggs, nuts, and shellfish</strong>, suggesting a more widespread pattern of contamination across multiple food categories.
+</p>
+
+<p class="custom-text">
 Overall, this comparison indicates that European countries tend to have very rapid increases in a few dominant food categories, whereas Asian countries display growth that is spread across several food types. Such patterns hint at the influence of local dietary habits, food production, and packaging practices on microplastic exposure.
 </p>
 """, unsafe_allow_html=True)
